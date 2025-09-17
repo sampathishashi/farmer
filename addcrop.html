@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Add Crop Details</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f4f8fb; margin: 0; }
+        .container { max-width: 420px; margin: 50px auto; background: #fff; border-radius: 12px; box-shadow: 0 2px 16px rgba(42,122,226,0.10); padding: 32px 24px; }
+        h2 { color: #2a7ae2; text-align: center; margin-bottom: 24px; }
+        form { display: flex; flex-direction: column; gap: 18px; }
+        input, select { padding: 12px; border-radius: 8px; border: 1px solid #d2e3f7; font-size: 1em; }
+        button { background: #2a7ae2; color: #fff; border: none; border-radius: 8px; padding: 14px; font-size: 1.1em; cursor: pointer; margin-top: 10px; }
+        button:hover { background: #155fa0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Add Crop Details</h2>
+        <form method="POST">
+            <input name="cropname" placeholder="Crop Name" required>
+            <input name="quantity" placeholder="Quantity" required>
+            <input name="price" placeholder="Price" required>
+            <input name="place" placeholder="Your Place" required>
+            <input name="phone" placeholder="Your Phone" required>
+            <input name="seller_email" placeholder="Your Email" required>
+            <select name="agent_email" required>
+                <option value="">Select Agent</option>
+                {% for agent in agents %}
+                <option value="{{ agent.email }}">{{ agent.name }} ({{ agent.district }})</option>
+                {% endfor %}
+            </select>
+            <button type="submit">Add Crop</button>
+        </form>
+    </div>
+</body>
+</html> 

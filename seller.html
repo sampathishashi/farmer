@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Seller Home</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; background: #f9f9f9; }
+        .container { background: #fff; padding: 30px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.07); max-width: 500px; margin: auto; }
+        h1 { color: #2d6a4f; }
+        ol { margin-top: 20px; }
+        li { margin-bottom: 12px; font-size: 1.1em; }
+        .btn-select-agent {
+            display: inline-block;
+            margin-top: 24px;
+            padding: 12px 28px;
+            background: #40916c;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            font-size: 1.1em;
+            text-decoration: none;
+            transition: background 0.2s;
+            cursor: pointer;
+        }
+        .btn-select-agent:hover {
+            background: #26734d;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div style="background:#fffbe6;padding:16px 18px;border-radius:10px;box-shadow:0 2px 8px rgba(42,122,226,0.08);margin-bottom:18px;text-align:left;">
+            <span style="font-size:1.1em;color:#888;font-weight:bold;">Username:</span>
+            <span style="font-size:1.1em;color:#2a7ae2;">{{ session['username'] if session['username'] else 'Unknown' }}</span>
+        </div>
+        <div style="background:#e3f0ff;padding:22px 18px;border-radius:10px;box-shadow:0 2px 8px rgba(42,122,226,0.08);margin-bottom:24px;text-align:center;">
+            <h2 style="color:#2a7ae2;margin:0 0 8px 0;">Your Profit Dashboard</h2>
+            <!-- Profit value removed as requested -->
+        </div>
+        {% if notifications %}
+        <div style="background:#fffbe6;padding:18px 18px;border-radius:10px;box-shadow:0 2px 8px rgba(42,122,226,0.08);margin-bottom:24px;">
+            <h3 style="color:#ad8b00;">Product Sale Requests</h3>
+            {% for note in notifications %}
+                {% if note.status == 'buy_request' %}
+                <div style="background:#fff;border-radius:8px;padding:14px 12px;margin-bottom:12px;box-shadow:0 1px 4px rgba(42,122,226,0.06);">
+                    <p><strong>Crop:</strong> {{ note.cropname }}</p>
+                    <p><strong>Quantity:</strong> {{ note.quantity }} kg</p>
+                    <p><strong>Buyer:</strong> {{ note.buyer_username }}</p>
+                    <form action="/accept_sale/{{ note._id }}" method="post" style="display:inline;">
+                        <button type="submit" style="background:#52c41a;color:#fff;padding:6px 18px;border:none;border-radius:6px;">Yes</button>
+                    </form>
+                    <form action="/reject_sale/{{ note._id }}" method="post" style="display:inline;">
+                        <button type="submit" style="background:#ff4d4f;color:#fff;padding:6px 18px;border:none;border-radius:6px;">No</button>
+                    </form>
+                </div>
+                {% endif %}
+            {% endfor %}
+            <h3 style="color:#52c41a;">Accepted Sales</h3>
+            {% for note in notifications %}
+                {% if note.status == 'sale_accepted' %}
+                <div style="background:#e6ffed;border-radius:8px;padding:14px 12px;margin-bottom:12px;">
+                    <p><strong>Crop:</strong> {{ note.cropname }}</p>
+                    <p><strong>Quantity:</strong> {{ note.quantity }} kg</p>
+                    <p><strong>Buyer:</strong> {{ note.buyer_username }}</p>
+                    <p><strong>Status:</strong> Accepted</p>
+                </div>
+                {% endif %}
+            {% endfor %}
+            <h3 style="color:#ff4d4f;">Rejected Sales</h3>
+            {% for note in notifications %}
+                {% if note.status == 'sale_rejected' %}
+                <div style="background:#fff1f0;border-radius:8px;padding:14px 12px;margin-bottom:12px;">
+                    <p><strong>Crop:</strong> {{ note.cropname }}</p>
+                    <p><strong>Quantity:</strong> {{ note.quantity }} kg</p>
+                    <p><strong>Buyer:</strong> {{ note.buyer_username }}</p>
+                    <p><strong>Status:</strong> Rejected</p>
+                </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+        {% endif %}
+        <h1>Seller Home</h1>
+        <p>Follow these steps to get started:</p>
+        <ol>
+            <li><strong>Select the agent</strong></li>
+            <li>List your crops for sale</li>
+            <li>Set your prices and quantities</li>
+            <li>Review and confirm your listings</li>
+            <li>Track sales and manage orders</li>
+        </ol>
+        <a href="/selectagent" class="btn-select-agent">Select Agent</a>
+    </div>
+</body>
+</html> 

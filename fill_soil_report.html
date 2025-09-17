@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fill Soil Report - Agent Dashboard</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #f4f8fb;
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: #fff;
+            border-radius: 14px;
+            box-shadow: 0 2px 16px rgba(42,122,226,0.10);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 2.2em;
+            font-weight: 600;
+        }
+
+        .header p {
+            margin: 10px 0 0 0;
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+
+        .back-btn {
+            position: absolute;
+            top: 30px;
+            left: 30px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background 0.2s;
+        }
+
+        .back-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .main-content {
+            padding: 30px;
+        }
+
+        .form-section {
+            margin-bottom: 30px;
+            padding: 25px;
+            background: #f8fafc;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .form-section h3 {
+            color: #10b981;
+            margin-bottom: 20px;
+            font-size: 1.3em;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 10px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 1em;
+            box-sizing: border-box;
+            transition: border-color 0.2s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #10b981;
+            box-shadow: 0 0 0 3px rgba(16,185,129,0.1);
+        }
+
+        .form-control:disabled {
+            background: #f3f4f6;
+            color: #6b7280;
+        }
+
+        .farmer-info-card {
+            background: linear-gradient(135deg, #f0fdf4 0%, #ffffff 100%);
+            border: 1px solid #bbf7d0;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .farmer-info-card h4 {
+            color: #10b981;
+            margin-bottom: 15px;
+        }
+
+        .farmer-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .farmer-detail {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .farmer-detail i {
+            color: #10b981;
+            width: 20px;
+        }
+
+        .soil-parameters {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .parameter-group {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .parameter-group h4 {
+            color: #10b981;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+
+        .range-slider {
+            width: 100%;
+            margin: 10px 0;
+        }
+
+        .range-value {
+            font-weight: 600;
+            color: #10b981;
+            text-align: center;
+            margin-top: 5px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1em;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #059669;
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: #64748b;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #475569;
+        }
+
+        .btn-warning {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background: #d97706;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .recommendations {
+            background: linear-gradient(135deg, #fef3c7 0%, #ffffff 100%);
+            border: 1px solid #fbbf24;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .recommendations h4 {
+            color: #92400e;
+            margin-bottom: 15px;
+        }
+
+        .crop-recommendations {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .crop-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #fbbf24;
+            text-align: center;
+        }
+
+        .crop-card h5 {
+            color: #92400e;
+            margin-bottom: 8px;
+        }
+
+        .crop-card p {
+            color: #6b7280;
+            font-size: 0.9em;
+        }
+
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .soil-parameters {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <button class="back-btn" onclick="goBack()">← Back to Dashboard</button>
+            <h1>📋 Fill Soil Report</h1>
+            <p>Complete soil analysis and provide recommendations</p>
+        </div>
+
+        <div class="main-content">
+            {% if auto_select_farmer %}
+            <div class="alert alert-info" style="background: #e6f7ff; border: 1px solid #91d5ff; color: #1890ff; padding: 12px; border-radius: 6px; margin-bottom: 20px;">
+                <strong>🎯 Auto-Selected Farmer:</strong> {{ auto_select_farmer }} - The farmer has been automatically selected for you. Please review the details below and proceed with the soil analysis.
+            </div>
+            {% endif %}
+            
+            <form method="POST" action="/submit-soil-report">
+                <!-- Farmer Selection Section -->
+                <div class="form-section">
+                    <h3>👨‍🌾 Select Farmer</h3>
+                    <div class="form-group">
+                        <label for="farmer_select">Choose the farmer for this report:</label>
+                        <select id="farmer_select" name="farmer_username" class="form-control" required onchange="loadFarmerDetails()">
+                            <option value="">Select a farmer...</option>
+                            {% for request in pending_requests %}
+                            <option value="{{ request.farmer_username }}" 
+                                    data-name="{{ request.farmer_name }}"
+                                    data-phone="{{ request.farmer_phone }}"
+                                    data-address="{{ request.farmer_address }}"
+                                    data-district="{{ request.agent_district }}"
+                                    data-crop="{{ request.crop_intention }}"
+                                    {% if auto_select_farmer and request.farmer_name == auto_select_farmer %}selected{% endif %}>
+                                {{ request.farmer_name }} - {{ request.agent_district }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div id="farmer_details" class="farmer-info-card" style="display: none;">
+                        <h4>📞 Farmer Information</h4>
+                        <div class="farmer-details">
+                            <div class="farmer-detail">
+                                <i>👤</i>
+                                <span id="farmer_name_display"></span>
+                            </div>
+                            <div class="farmer-detail">
+                                <i>📱</i>
+                                <span id="farmer_phone_display"></span>
+                            </div>
+                            <div class="farmer-detail">
+                                <i>📍</i>
+                                <span id="farmer_address_display"></span>
+                            </div>
+                            <div class="farmer-detail">
+                                <i>🏘️</i>
+                                <span id="farmer_district_display"></span>
+                            </div>
+                            <div class="farmer-detail">
+                                <i>🌾</i>
+                                <span id="farmer_crop_display"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Soil Parameters Section -->
+                <div class="form-section">
+                    <h3>🧪 Soil Analysis Parameters</h3>
+                    <div class="soil-parameters">
+                        <div class="parameter-group">
+                            <h4>Nitrogen (N) - {{ nitrogen_value }} mg/kg</h4>
+                            <input type="range" id="nitrogen" name="nitrogen" min="0" max="200" value="50" 
+                                   class="range-slider" oninput="updateValue('nitrogen', this.value)">
+                            <div class="range-value" id="nitrogen_value">50 mg/kg</div>
+                            <p style="font-size: 0.9em; color: #6b7280; margin-top: 5px;">
+                                Low: 0-50 | Medium: 51-100 | High: 101-200
+                            </p>
+                        </div>
+
+                        <div class="parameter-group">
+                            <h4>Phosphorus (P) - {{ phosphorus_value }} mg/kg</h4>
+                            <input type="range" id="phosphorus" name="phosphorus" min="0" max="100" value="25" 
+                                   class="range-slider" oninput="updateValue('phosphorus', this.value)">
+                            <div class="range-value" id="phosphorus_value">25 mg/kg</div>
+                            <p style="font-size: 0.9em; color: #6b7280; margin-top: 5px;">
+                                Low: 0-25 | Medium: 26-50 | High: 51-100
+                            </p>
+                        </div>
+
+                        <div class="parameter-group">
+                            <h4>Potassium (K) - {{ potassium_value }} mg/kg</h4>
+                            <input type="range" id="potassium" name="potassium" min="0" max="300" value="100" 
+                                   class="range-slider" oninput="updateValue('potassium', this.value)">
+                            <div class="range-value" id="potassium_value">100 mg/kg</div>
+                            <p style="font-size: 0.9em; color: #6b7280; margin-top: 5px;">
+                                Low: 0-100 | Medium: 101-200 | High: 201-300
+                            </p>
+                        </div>
+
+                        <div class="parameter-group">
+                            <h4>pH Level - {{ ph_value }}</h4>
+                            <input type="range" id="ph_level" name="ph_level" min="4" max="10" value="6.5" step="0.1" 
+                                   class="range-slider" oninput="updateValue('ph_level', this.value)">
+                            <div class="range-value" id="ph_level_value">6.5</div>
+                            <p style="font-size: 0.9em; color: #6b7280; margin-top: 5px;">
+                                Acidic: 4-6 | Neutral: 6-7 | Alkaline: 7-10
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="soil_texture">Soil Texture:</label>
+                        <select id="soil_texture" name="soil_texture" class="form-control" required>
+                            <option value="">Select soil texture...</option>
+                            <option value="Sandy">Sandy</option>
+                            <option value="Loamy">Loamy</option>
+                            <option value="Clayey">Clayey</option>
+                            <option value="Silty">Silty</option>
+                            <option value="Sandy Loam">Sandy Loam</option>
+                            <option value="Clay Loam">Clay Loam</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="organic_matter">Organic Matter Content (%):</label>
+                        <input type="number" id="organic_matter" name="organic_matter" min="0" max="10" step="0.1" 
+                               value="2.0" class="form-control" required>
+                    </div>
+                </div>
+
+                <!-- Recommendations Section -->
+                <div class="form-section">
+                    <h3>🌾 Crop Recommendations</h3>
+                    <div class="recommendations">
+                        <h4>💡 Based on your soil analysis, here are recommended crops:</h4>
+                        <div class="crop-recommendations" id="crop_recommendations">
+                            <div class="crop-card">
+                                <h5>🌾 Wheat</h5>
+                                <p>Best suited for loamy soil with pH 6-7</p>
+                            </div>
+                            <div class="crop-card">
+                                <h5>🌽 Maize</h5>
+                                <p>Requires well-drained soil with good N content</p>
+                            </div>
+                            <div class="crop-card">
+                                <h5>🌱 Pulses</h5>
+                                <p>Good for soil with moderate P and K levels</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="recommended_crops">Final Crop Recommendations:</label>
+                        <textarea id="recommended_crops" name="recommended_crops" class="form-control" rows="4" 
+                                  placeholder="Enter detailed crop recommendations based on soil analysis..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="fertilizer_recommendations">Fertilizer Recommendations:</label>
+                        <textarea id="fertilizer_recommendations" name="fertilizer_recommendations" class="form-control" rows="4" 
+                                  placeholder="Enter fertilizer recommendations..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="additional_notes">Additional Notes:</label>
+                        <textarea id="additional_notes" name="additional_notes" class="form-control" rows="3" 
+                                  placeholder="Any additional observations or recommendations..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Form Actions -->
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="saveDraft()">💾 Save Draft</button>
+                    <button type="button" class="btn btn-warning" onclick="previewReport()">👁️ Preview Report</button>
+                    <button type="submit" class="btn btn-primary">📤 Submit Report</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Update range slider values
+        function updateValue(param, value) {
+            const displayElement = document.getElementById(param + '_value');
+            if (param === 'ph_level') {
+                displayElement.textContent = value;
+            } else {
+                displayElement.textContent = value + ' mg/kg';
+            }
+            
+            // Update recommendations based on values
+            updateRecommendations();
+        }
+
+        // Load farmer details when selected
+        function loadFarmerDetails() {
+            const select = document.getElementById('farmer_select');
+            const selectedOption = select.options[select.selectedIndex];
+            const farmerDetails = document.getElementById('farmer_details');
+            
+            if (select.value) {
+                document.getElementById('farmer_name_display').textContent = selectedOption.dataset.name;
+                document.getElementById('farmer_phone_display').textContent = selectedOption.dataset.phone;
+                document.getElementById('farmer_address_display').textContent = selectedOption.dataset.address;
+                document.getElementById('farmer_district_display').textContent = selectedOption.dataset.district;
+                document.getElementById('farmer_crop_display').textContent = selectedOption.dataset.crop || 'Not specified';
+                farmerDetails.style.display = 'block';
+            } else {
+                farmerDetails.style.display = 'none';
+            }
+        }
+
+        // Update crop recommendations based on soil parameters
+        function updateRecommendations() {
+            const nitrogen = parseInt(document.getElementById('nitrogen').value);
+            const phosphorus = parseInt(document.getElementById('phosphorus').value);
+            const potassium = parseInt(document.getElementById('potassium').value);
+            const ph = parseFloat(document.getElementById('ph_level').value);
+            const texture = document.getElementById('soil_texture').value;
+            
+            let recommendations = [];
+            
+            // Nitrogen-based recommendations
+            if (nitrogen < 50) {
+                recommendations.push({ crop: '🌾 Wheat', reason: 'Low N - requires nitrogen-fixing crops first' });
+                recommendations.push({ crop: '🌱 Pulses', reason: 'Good for improving soil nitrogen' });
+            } else if (nitrogen > 100) {
+                recommendations.push({ crop: '🌽 Maize', reason: 'High N - good for heavy feeders' });
+                recommendations.push({ crop: '🌾 Rice', reason: 'Requires high nitrogen levels' });
+            } else {
+                recommendations.push({ crop: '🌾 Wheat', reason: 'Moderate N - suitable for wheat' });
+                recommendations.push({ crop: '🌽 Maize', reason: 'Good nitrogen levels for maize' });
+            }
+            
+            // Phosphorus-based recommendations
+            if (phosphorus < 25) {
+                recommendations.push({ crop: '🌱 Pulses', reason: 'Low P - pulses are less P demanding' });
+            } else if (phosphorus > 50) {
+                recommendations.push({ crop: '🌾 Wheat', reason: 'High P - good for wheat development' });
+            }
+            
+            // pH-based recommendations
+            if (ph < 6) {
+                recommendations.push({ crop: '🌱 Tea', reason: 'Acidic soil suitable for tea' });
+            } else if (ph > 7.5) {
+                recommendations.push({ crop: '🌾 Barley', reason: 'Alkaline soil good for barley' });
+            }
+            
+            // Texture-based recommendations
+            if (texture === 'Sandy') {
+                recommendations.push({ crop: '🥜 Groundnut', reason: 'Sandy soil good for groundnut' });
+            } else if (texture === 'Clayey') {
+                recommendations.push({ crop: '🌾 Rice', reason: 'Clayey soil retains water for rice' });
+            }
+            
+            // Update recommendations display
+            const container = document.getElementById('crop_recommendations');
+            container.innerHTML = '';
+            
+            recommendations.slice(0, 4).forEach(rec => {
+                const card = document.createElement('div');
+                card.className = 'crop-card';
+                card.innerHTML = `
+                    <h5>${rec.crop}</h5>
+                    <p>${rec.reason}</p>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // Save draft function
+        function saveDraft() {
+            alert('Draft saved successfully! You can continue editing later.');
+        }
+
+        // Preview report function
+        function previewReport() {
+            const farmerName = document.getElementById('farmer_name_display').textContent;
+            if (!farmerName) {
+                alert('Please select a farmer first!');
+                return;
+            }
+            
+            const nitrogen = document.getElementById('nitrogen').value;
+            const phosphorus = document.getElementById('phosphorus').value;
+            const potassium = document.getElementById('potassium').value;
+            const ph = document.getElementById('ph_level').value;
+            const texture = document.getElementById('soil_texture').value;
+            
+            const preview = `
+🌱 SOIL ANALYSIS REPORT PREVIEW
+
+Farmer: ${farmerName}
+Date: ${new Date().toLocaleDateString()}
+
+SOIL PARAMETERS:
+• Nitrogen: ${nitrogen} mg/kg
+• Phosphorus: ${phosphorus} mg/kg  
+• Potassium: ${potassium} mg/kg
+• pH Level: ${ph}
+• Soil Texture: ${texture}
+
+RECOMMENDATIONS:
+• Based on current soil analysis
+• Detailed recommendations will be finalized
+            `;
+            
+            alert(preview);
+        }
+
+        // Go back function
+        function goBack() {
+            window.location.href = '/soilagent';
+        }
+
+        // Initialize recommendations on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            updateRecommendations();
+            
+            // Auto-load farmer details if farmer is pre-selected
+            {% if auto_select_farmer %}
+            const farmerSelect = document.getElementById('farmer_select');
+            if (farmerSelect.value) {
+                loadFarmerDetails();
+                // Show a subtle success message
+                setTimeout(() => {
+                    const alertDiv = document.querySelector('.alert-info');
+                    if (alertDiv) {
+                        alertDiv.style.background = '#f6ffed';
+                        alertDiv.style.borderColor = '#b7eb8f';
+                        alertDiv.style.color = '#52c41a';
+                    }
+                }, 500);
+            }
+            {% endif %}
+        });
+    </script>
+</body>
+</html> 

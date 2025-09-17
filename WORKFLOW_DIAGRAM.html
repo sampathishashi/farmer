@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Soil Analysis System - Complete Workflow</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #2d3748;
+            font-size: 2.5rem;
+            margin-bottom: 40px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .workflow-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .step {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            border-left: 5px solid #667eea;
+            transition: transform 0.3s ease;
+        }
+        
+        .step:hover {
+            transform: translateY(-5px);
+        }
+        
+        .step-number {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        
+        .step h3 {
+            color: #2d3748;
+            margin: 0 0 15px 0;
+            font-size: 1.3rem;
+        }
+        
+        .step-content {
+            color: #4a5568;
+            line-height: 1.6;
+        }
+        
+        .step-content ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+        
+        .step-content li {
+            margin-bottom: 8px;
+        }
+        
+        .user-role {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+        
+        .farmer-role {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+        
+        .agent-role {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        }
+        
+        .system-role {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        }
+        
+        .flow-arrow {
+            text-align: center;
+            font-size: 2rem;
+            color: #667eea;
+            margin: 20px 0;
+        }
+        
+        .detailed-flow {
+            background: #f7fafc;
+            border-radius: 15px;
+            padding: 30px;
+            margin-top: 40px;
+        }
+        
+        .detailed-flow h2 {
+            color: #2d3748;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2rem;
+        }
+        
+        .flow-step {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+        
+        .flow-step-number {
+            background: #667eea;
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin-right: 20px;
+            flex-shrink: 0;
+        }
+        
+        .flow-step-content {
+            flex: 1;
+        }
+        
+        .flow-step-content h4 {
+            color: #2d3748;
+            margin: 0 0 8px 0;
+            font-size: 1.1rem;
+        }
+        
+        .flow-step-content p {
+            color: #4a5568;
+            margin: 0;
+            line-height: 1.5;
+        }
+        
+        .highlight-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        .highlight-box h3 {
+            margin: 0 0 10px 0;
+            font-size: 1.3rem;
+        }
+        
+        .highlight-box p {
+            margin: 0;
+            opacity: 0.9;
+        }
+        
+        .feature-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        .feature-item {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+        
+        .feature-item h4 {
+            color: #2d3748;
+            margin: 0 0 10px 0;
+        }
+        
+        .feature-item p {
+            color: #4a5568;
+            margin: 0;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌱 Soil Analysis Report System - Complete Workflow</h1>
+        
+        <div class="highlight-box">
+            <h3>🎯 New Feature: Agent Selection</h3>
+            <p>Farmers can now select specific soil agents from their district with detailed agent information and specializations.</p>
+        </div>
+        
+        <div class="workflow-container">
+            <div class="step">
+                <div class="step-number">1</div>
+                <div class="user-role farmer-role">👨‍🌾 Farmer</div>
+                <h3>Login & Access Dashboard</h3>
+                <div class="step-content">
+                    <ul>
+                        <li>Farmer logs into the system</li>
+                        <li>Accesses the farmer dashboard</li>
+                        <li>Views existing soil reports (if any)</li>
+                        <li>Sees pending requests status</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="step">
+                <div class="step-number">2</div>
+                <div class="user-role farmer-role">🌱 Request Soil Analysis</div>
+                <h3>Fill Request Form</h3>
+                <div class="step-content">
+                    <ul>
+                        <li>Enter personal details (name, phone, address)</li>
+                        <li><strong>Select district from dropdown</strong></li>
+                        <li><strong>Choose specific soil agent from district</strong></li>
+                        <li>View agent details (experience, specialization)</li>
+                        <li>Add intended crop (optional)</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="step">
+                <div class="step-number">3</div>
+                <div class="user-role system-role">⚙️ System Processing</div>
+                <h3>Request Processing</h3>
+                <div class="step-content">
+                    <ul>
+                        <li>System validates farmer and agent data</li>
+                        <li>Creates soil analysis request record</li>
+                        <li>Sends notification to selected agent</li>
+                        <li>Updates farmer dashboard with pending status</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="step">
+                <div class="step-number">4</div>
+                <div class="user-role agent-role">🔬 Soil Agent</div>
+                <h3>Agent Receives Request</h3>
+                <div class="step-content">
+                    <ul>
+                        <li>Agent logs into their dashboard</li>
+                        <li>Views new soil analysis request</li>
+                        <li>Sees farmer contact details</li>
+                        <li>Contacts farmer for sample collection</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="step">
+                <div class="step-number">5</div>
+                <div class="user-role agent-role">🧪 Soil Analysis</div>
+                <h3>Perform Analysis</h3>
+                <div class="step-content">
+                    <ul>
+                        <li>Collect soil samples from farmer's field</li>
+                        <li>Perform laboratory analysis</li>
+                        <li>Test NPK levels, pH, texture, organic matter</li>
+                        <li>Determine crop recommendations</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="step">
+                <div class="step-number">6</div>
+                <div class="user-role agent-role">📝 Update Report</div>
+                <h3>Submit Analysis Report</h3>
+                <div class="step-content">
+                    <ul>
+                        <li>Fill detailed soil analysis form</li>
+                        <li>Enter all soil parameters</li>
+                        <li>Select recommended crops</li>
+                        <li>Add detailed recommendations</li>
+                        <li>Submit completed report</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="step">
+                <div class="step-number">7</div>
+                <div class="user-role system-role">✅ Report Generation</div>
+                <h3>System Updates</h3>
+                <div class="step-content">
+                    <ul>
+                        <li>System creates soil report record</li>
+                        <li>Updates request status to completed</li>
+                        <li>Notifies farmer about completed report</li>
+                        <li>Makes report available in farmer dashboard</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="step">
+                <div class="step-number">8</div>
+                <div class="user-role farmer-role">🌾 View Results</div>
+                <h3>Farmer Reviews Report</h3>
+                <div class="step-content">
+                    <ul>
+                        <li>Farmer views completed soil report</li>
+                        <li>Sees detailed soil analysis results</li>
+                        <li>Reviews recommended crops</li>
+                        <li>Reads detailed recommendations</li>
+                        <li>Plans farming activities accordingly</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="detailed-flow">
+            <h2>🔍 Detailed Agent Selection Workflow</h2>
+            
+            <div class="flow-step">
+                <div class="flow-step-number">1</div>
+                <div class="flow-step-content">
+                    <h4>District Selection</h4>
+                    <p>Farmer selects their district from the dropdown menu. The system shows major cities and districts where soil agents are available.</p>
+                </div>
+            </div>
+            
+            <div class="flow-step">
+                <div class="flow-step-number">2</div>
+                <div class="flow-step-content">
+                    <h4>Agent List Display</h4>
+                    <p>Based on the selected district, the system dynamically loads and displays available soil agents with their specializations.</p>
+                </div>
+            </div>
+            
+            <div class="flow-step">
+                <div class="flow-step-number">3</div>
+                <div class="flow-step-content">
+                    <h4>Agent Information</h4>
+                    <p>When an agent is selected, detailed information is shown including name, phone number, experience, and specialization area.</p>
+                </div>
+            </div>
+            
+            <div class="flow-step">
+                <div class="flow-step-number">4</div>
+                <div class="flow-step-content">
+                    <h4>Request Submission</h4>
+                    <p>Farmer submits the request with the selected agent. The system validates the selection and creates the soil analysis request.</p>
+                </div>
+            </div>
+            
+            <div class="flow-step">
+                <div class="flow-step-number">5</div>
+                <div class="flow-step-content">
+                    <h4>Agent Notification</h4>
+                    <p>The selected agent receives an immediate notification about the new soil analysis request with farmer contact details.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="feature-list">
+            <div class="feature-item">
+                <h4>🎯 Smart Agent Matching</h4>
+                <p>Farmers can choose agents based on their specialization and experience level for better soil analysis results.</p>
+            </div>
+            
+            <div class="feature-item">
+                <h4>📞 Direct Communication</h4>
+                <p>Agent contact information is provided for direct communication between farmers and soil experts.</p>
+            </div>
+            
+            <div class="feature-item">
+                <h4>🔬 Specialized Expertise</h4>
+                <p>Different agents have different specializations like soil chemistry, microbiology, organic farming, etc.</p>
+            </div>
+            
+            <div class="feature-item">
+                <h4>📊 Detailed Reports</h4>
+                <p>Comprehensive soil analysis reports with crop recommendations and farming advice.</p>
+            </div>
+            
+            <div class="feature-item">
+                <h4>⏱️ Real-time Tracking</h4>
+                <p>Farmers can track the status of their soil analysis requests in real-time.</p>
+            </div>
+            
+            <div class="feature-item">
+                <h4>🌾 Crop Recommendations</h4>
+                <p>AI-powered crop suggestions based on soil parameters and local conditions.</p>
+            </div>
+        </div>
+        
+        <div class="highlight-box">
+            <h3>🚀 Benefits of Agent Selection Feature</h3>
+            <p>• Better quality soil analysis through specialized agents • Direct communication between farmers and experts • Personalized recommendations based on agent expertise • Improved farmer satisfaction and trust • Efficient resource allocation and workload distribution</p>
+        </div>
+    </div>
+</body>
+</html> 

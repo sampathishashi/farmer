@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Agent Dashboard</title>
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f4f8fb; margin: 0; }
+        .container { max-width: 700px; margin: 50px auto; background: #fff; border-radius: 14px; box-shadow: 0 2px 16px rgba(42,122,226,0.10); padding: 36px 32px; }
+        h1 { color: #2a7ae2; margin-bottom: 10px; }
+        .stats { display: flex; gap: 32px; margin: 30px 0; justify-content: center; }
+        .stat-card { background: #e3f0ff; border-radius: 10px; padding: 18px 32px; text-align: center; min-width: 120px; }
+        .stat-card h2 { margin: 0; color: #2a7ae2; font-size: 2em; }
+        .stat-card p { margin: 6px 0 0 0; color: #333; font-size: 1.1em; }
+        .nav-btns { display: flex; gap: 18px; justify-content: center; margin-top: 30px; }
+        .nav-btns a { background: #2a7ae2; color: #fff; text-decoration: none; padding: 14px 28px; border-radius: 8px; font-size: 1.1em; transition: background 0.2s; }
+        .nav-btns a:hover { background: #155fa0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+            <h1>Welcome, Agent!</h1>
+            <div style="position:relative;">
+                <span id="notifBell" style="font-size:2em;cursor:pointer;">🔔</span>
+                {% if notifications and notifications|length > 0 %}
+                <span id="notifBadge" style="position:absolute;top:-8px;right:-8px;background:#c00;color:#fff;border-radius:50%;padding:2px 8px;font-size:0.9em;font-weight:bold;">{{ notifications|length }}</span>
+                <div id="notifDropdown" style="display:none;position:absolute;right:0;top:36px;background:#fff;box-shadow:0 2px 8px rgba(0,0,0,0.12);border-radius:8px;min-width:320px;z-index:10;">
+                    <ul style="list-style:none;padding:12px 0;margin:0;">
+                        {% for note in notifications %}
+                        <li style="padding:10px 18px;border-bottom:1px solid #eee;">
+                            {{ note.message }}<br>
+                            <form action="/accept_crop/{{ note._id }}" method="post" style="display:inline;">
+                                <button type="submit">Yes</button>
+                            </form>
+                            <form action="/reject_crop/{{ note._id }}" method="post" style="display:inline;">
+                                <button type="submit">No</button>
+                            </form>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        <audio id="notifSound" src="https://cdn.pixabay.com/audio/2022/07/26/audio_124bfae5b6.mp3" preload="auto"></audio>
+        <script>
+        const bell = document.getElementById('notifBell');
+        const dropdown = document.getElementById('notifDropdown');
+        const notifSound = document.getElementById('notifSound');
+        if (bell && dropdown) {
+            bell.addEventListener('click', function() {
+                if (dropdown.style.display === 'none' || dropdown.style.display === '') {
+                    dropdown.style.display = 'block';
+                    if (document.getElementById('notifBadge')) notifSound.play();
+                } else {
+                    dropdown.style.display = 'none';
+                }
+            });
+            document.addEventListener('click', function(e) {
+                if (!bell.contains(e.target) && !dropdown.contains(e.target)) {
+                    dropdown.style.display = 'none';
+                }
+            });
+        }
+        </script>
+        <div class="stats">
+            <div class="stat-card">
+                <h2>{{ notifications|length if notifications else 0 }}</h2>
+                <p>Crop Submissions</p>
+            </div>
+            <div class="stat-card">
+                <h2>{{ soil_requests|length if soil_requests else 0 }}</h2>
+                <p>Soil Requests</p>
+            </div>
+            <div class="stat-card">
+                <h2>{{ unread_count if unread_count else 0 }}</h2>
+                <p>New Notifications</p>
+            </div>
+        </div>
+        {% if notifications %}
+        <div class="notifications" style="background:#fffbe6;border:1px solid #ffe58f;padding:18px 20px;border-radius:8px;margin-bottom:24px;">
+            <h3 style="color:#ad8b00;">New Crop Submissions</h3>
+            <!-- Pending Section -->
+            <h4 style="color:#ad8b00; margin-top:18px;">Pending</h4>
+            <div style="display: flex; flex-wrap: wrap; gap: 18px;">
+                {% for note in notifications %}
+                {% set status = note.response if note.response else 'pending' %}
+                {% if note.cropname and status|lower == 'pending' %}
+                <div style="background: #fff; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); padding: 18px 22px; min-width: 270px; max-width: 320px; margin-bottom: 10px; border: 2.5px solid #ffe58f; position: relative;">
+                    <span style="position:absolute;top:10px;right:18px;padding:4px 12px;border-radius:12px;font-size:0.95em;font-weight:bold;background:#ffe58f;color:#ad8b00;">Pending</span>
+                    <h4 style="margin:0 0 8px 0; color:#2a7ae2;">{{ note.cropname }}</h4>
+                    <p style="margin:4px 0;"><strong>Date:</strong> {{ note.created_at.strftime('%Y-%m-%d %H:%M') if note.created_at else '' }}</p>
+                    <p style="margin:4px 0;"><strong>Quantity:</strong> {{ note.quantity }} kg</p>
+                    <p style="margin:4px 0;"><strong>Price:</strong> ₹{{ note.price }}</p>
+                    <p style="margin:4px 0;"><strong>Seller:</strong> {{ note.seller_name }}</p>
+                    <p style="margin:4px 0;"><strong>Place:</strong> {{ note.place }}</p>
+                    <p style="margin:4px 0;"><strong>Phone:</strong> {{ note.phone }}</p>
+                    <p style="margin:4px 0;"><strong>Email:</strong> {{ note.seller_email }}</p>
+                    <form action="/accept_crop/{{ note._id }}" method="post" style="display:inline;">
+                        <button type="submit">Accept</button>
+                    </form>
+                    <form action="/reject_crop/{{ note._id }}" method="post" style="display:inline;">
+                        <button type="submit">Reject</button>
+                    </form>
+                </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+            <!-- Accepted Section -->
+            <h4 style="color:#52c41a; margin-top:18px;">Accepted</h4>
+            <div style="display: flex; flex-wrap: wrap; gap: 18px;">
+                {% for note in notifications %}
+                {% set status = note.response if note.response else 'pending' %}
+                {% if note.cropname and status|lower == 'accepted' %}
+                <div style="background: #fff; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); padding: 18px 22px; min-width: 270px; max-width: 320px; margin-bottom: 10px; border: 2.5px solid #52c41a; position: relative;">
+                    <span style="position:absolute;top:10px;right:18px;padding:4px 12px;border-radius:12px;font-size:0.95em;font-weight:bold;background:#52c41a;color:#fff;">Accepted</span>
+                    <h4 style="margin:0 0 8px 0; color:#2a7ae2;">{{ note.cropname }}</h4>
+                    <p style="margin:4px 0;"><strong>Quantity:</strong> {{ note.quantity }} kg</p>
+                    <p style="margin:4px 0;"><strong>Price:</strong> ₹{{ note.price }}</p>
+                    <p style="margin:4px 0;"><strong>Seller:</strong> {{ note.seller_name }}</p>
+                    <p style="margin:4px 0;"><strong>Place:</strong> {{ note.place }}</p>
+                    <p style="margin:4px 0;"><strong>Phone:</strong> {{ note.phone }}</p>
+                    <p style="margin:4px 0;"><strong>Email:</strong> {{ note.seller_email }}</p>
+                </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+            <!-- Rejected Section -->
+            <h4 style="color:#ff4d4f; margin-top:18px;">Rejected</h4>
+            <div style="display: flex; flex-wrap: wrap; gap: 18px;">
+                {% for note in notifications %}
+                {% set status = note.response if note.response else 'pending' %}
+                {% if note.cropname and status|lower == 'rejected' %}
+                <div style="background: #fff; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); padding: 18px 22px; min-width: 270px; max-width: 320px; margin-bottom: 10px; border: 2.5px solid #ff4d4f; position: relative;">
+                    <span style="position:absolute;top:10px;right:18px;padding:4px 12px;border-radius:12px;font-size:0.95em;font-weight:bold;background:#ff4d4f;color:#fff;">Rejected</span>
+                    <h4 style="margin:0 0 8px 0; color:#2a7ae2;">{{ note.cropname }}</h4>
+                    <p style="margin:4px 0;"><strong>Quantity:</strong> {{ note.quantity }} kg</p>
+                    <p style="margin:4px 0;"><strong>Price:</strong> ₹{{ note.price }}</p>
+                    <p style="margin:4px 0;"><strong>Seller:</strong> {{ note.seller_name }}</p>
+                    <p style="margin:4px 0;"><strong>Place:</strong> {{ note.place }}</p>
+                    <p style="margin:4px 0;"><strong>Phone:</strong> {{ note.phone }}</p>
+                    <p style="margin:4px 0;"><strong>Email:</strong> {{ note.seller_email }}</p>
+                </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Farmer Notifications Section -->
+        {% if farmer_notifications %}
+        <div class="notifications" style="background:#e6f7ff;border:1px solid #91d5ff;padding:18px 20px;border-radius:8px;margin-bottom:24px;">
+            <h3 style="color:#1890ff;">Farmer Notifications</h3>
+            
+            <!-- Pending Section -->
+            <h4 style="color:#1890ff; margin-top:18px;">Pending</h4>
+            <div style="display: flex; flex-wrap: wrap; gap: 18px;">
+                {% for note in farmer_notifications %}
+                {% if note.status == 'pending' %}
+                <div style="background: #fff; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); padding: 18px 22px; min-width: 270px; max-width: 320px; margin-bottom: 10px; border: 2.5px solid #91d5ff; position: relative;">
+                    <span style="position:absolute;top:10px;right:18px;padding:4px 12px;border-radius:12px;font-size:0.95em;font-weight:bold;background:#91d5ff;color:#fff;">Pending</span>
+                    <h4 style="margin:0 0 8px 0; color:#2a7ae2;">Farmer Request</h4>
+                    <p style="margin:4px 0;"><strong>Date:</strong> {{ note.created_at.strftime('%Y-%m-%d %H:%M') if note.created_at else '' }}</p>
+                    <p style="margin:4px 0;"><strong>Message:</strong> {{ note.message }}</p>
+                    <p style="margin:4px 0;"><strong>Type:</strong> {{ note.notification_type.replace('_', ' ').title() }}</p>
+                    <div style="margin-top: 12px; display: flex; gap: 8px;">
+                        <form action="/update-notification-status/{{ note._id }}" method="post" style="display:inline;">
+                            <input type="hidden" name="status" value="update">
+                            <button type="submit" style="background:#1890ff;color:#fff;border:none;padding:6px 12px;border-radius:4px;cursor:pointer;">Update</button>
+                        </form>
+                        <form action="/update-notification-status/{{ note._id }}" method="post" style="display:inline;">
+                            <input type="hidden" name="status" value="pending">
+                            <button type="submit" style="background:#faad14;color:#fff;border:none;padding:6px 12px;border-radius:4px;cursor:pointer;">Pending</button>
+                        </form>
+                        <form action="/update-notification-status/{{ note._id }}" method="post" style="display:inline;">
+                            <input type="hidden" name="status" value="complete">
+                            <button type="submit" style="background:#52c41a;color:#fff;border:none;padding:6px 12px;border-radius:4px;cursor:pointer;">Complete</button>
+                        </form>
+                    </div>
+                </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+            
+            <!-- Update Section -->
+            <h4 style="color:#1890ff; margin-top:18px;">In Progress</h4>
+            <div style="display: flex; flex-wrap: wrap; gap: 18px;">
+                {% for note in farmer_notifications %}
+                {% if note.status == 'update' %}
+                <div style="background: #fff; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); padding: 18px 22px; min-width: 270px; max-width: 320px; margin-bottom: 10px; border: 2.5px solid #1890ff; position: relative;">
+                    <span style="position:absolute;top:10px;right:18px;padding:4px 12px;border-radius:12px;font-size:0.95em;font-weight:bold;background:#1890ff;color:#fff;">In Progress</span>
+                    <h4 style="margin:0 0 8px 0; color:#2a7ae2;">Farmer Request</h4>
+                    <p style="margin:4px 0;"><strong>Date:</strong> {{ note.created_at.strftime('%Y-%m-%d %H:%M') if note.created_at else '' }}</p>
+                    <p style="margin:4px 0;"><strong>Message:</strong> {{ note.message }}</p>
+                    <p style="margin:4px 0;"><strong>Type:</strong> {{ note.notification_type.replace('_', ' ').title() }}</p>
+                    <div style="margin-top: 12px; display: flex; gap: 8px;">
+                        <form action="/update-notification-status/{{ note._id }}" method="post" style="display:inline;">
+                            <input type="hidden" name="status" value="pending">
+                            <button type="submit" style="background:#faad14;color:#fff;border:none;padding:6px 12px;border-radius:4px;cursor:pointer;">Pending</button>
+                        </form>
+                        <form action="/update-notification-status/{{ note._id }}" method="post" style="display:inline;">
+                            <input type="hidden" name="status" value="complete">
+                            <button type="submit" style="background:#52c41a;color:#fff;border:none;padding:6px 12px;border-radius:4px;cursor:pointer;">Complete</button>
+                        </form>
+                    </div>
+                </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+            
+            <!-- Complete Section -->
+            <h4 style="color:#52c41a; margin-top:18px;">Completed</h4>
+            <div style="display: flex; flex-wrap: wrap; gap: 18px;">
+                {% for note in farmer_notifications %}
+                {% if note.status == 'complete' %}
+                <div style="background: #fff; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); padding: 18px 22px; min-width: 270px; max-width: 320px; margin-bottom: 10px; border: 2.5px solid #52c41a; position: relative;">
+                    <span style="position:absolute;top:10px;right:18px;padding:4px 12px;border-radius:12px;font-size:0.95em;font-weight:bold;background:#52c41a;color:#fff;">Completed</span>
+                    <h4 style="margin:0 0 8px 0; color:#2a7ae2;">Farmer Request</h4>
+                    <p style="margin:4px 0;"><strong>Date:</strong> {{ note.created_at.strftime('%Y-%m-%d %H:%M') if note.created_at else '' }}</p>
+                    <p style="margin:4px 0;"><strong>Message:</strong> {{ note.message }}</p>
+                    <p style="margin:4px 0;"><strong>Type:</strong> {{ note.notification_type.replace('_', ' ').title() }}</p>
+                    <p style="margin:4px 0;"><strong>Completed:</strong> {{ note.updated_at.strftime('%Y-%m-%d %H:%M') if note.updated_at else '' }}</p>
+                </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Soil Analysis Requests Section -->
+        {% if soil_requests %}
+        <div class="notifications" style="background:#f6ffed;border:1px solid #b7eb8f;padding:18px 20px;border-radius:8px;margin-bottom:24px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;">
+                <h3 style="color:#52c41a;margin:0;">🌱 Soil Analysis Requests</h3>
+                <div style="display:flex;gap:10px;align-items:center;">
+                    <button onclick="selectAllSoilRequests()" style="background:#1890ff;color:#fff;border:none;padding:6px 12px;border-radius:4px;cursor:pointer;font-size:0.9em;">☑️ Select All</button>
+                    <button onclick="clearAllSoilRequests()" style="background:#faad14;color:#fff;border:none;padding:6px 12px;border-radius:4px;cursor:pointer;font-size:0.9em;">☐ Clear All</button>
+                    <form action="/bulk-delete-soil-requests" method="post" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete all selected soil analysis requests? This action cannot be undone.');">
+                        <button type="submit" id="bulkDeleteBtn" style="background:#ff4d4f;color:#fff;border:none;padding:6px 12px;border-radius:4px;cursor:pointer;font-size:0.9em;display:none;">🗑️ Delete Selected</button>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Pending Soil Requests -->
+            <h4 style="color:#faad14; margin-top:18px;">⏳ Pending</h4>
+            <div style="display: flex; flex-wrap: wrap; gap: 18px;">
+                {% for request in soil_requests %}
+                {% if not request.is_read %}
+                <div style="background: #fff; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); padding: 18px 22px; min-width: 270px; max-width: 320px; margin-bottom: 10px; border: 2.5px solid #faad14; position: relative;">
+                    <input type="checkbox" name="request_ids" value="{{ request._id }}" class="soil-request-checkbox" style="position:absolute;top:10px;left:18px;transform:scale(1.2);" onchange="updateBulkDeleteButton()">
+                    <span style="position:absolute;top:10px;right:18px;padding:4px 12px;border-radius:12px;font-size:0.95em;font-weight:bold;background:#faad14;color:#fff;">Pending</span>
+                    <h4 style="margin:0 0 8px 0; color:#2a7ae2;">🚨 URGENT: Soil Analysis Request</h4>
+                    <p style="margin:4px 0;"><strong>👨‍🌾 Farmer:</strong> {{ request.farmer_name }}</p>
+                    <p style="margin:4px 0;"><strong>🏘️ District:</strong> {{ request.agent_district if request.agent_district else 'Not specified' }}</p>
+                    <p style="margin:4px 0;"><strong>📱 Phone:</strong> {{ request.farmer_phone }}</p>
+                    <p style="margin:4px 0;"><strong>📍 Address:</strong> {{ request.farmer_address }}</p>
+                    <p style="margin:4px 0;"><strong>🌾 Crop:</strong> {{ request.crop_intention if request.crop_intention else 'Not specified' }}</p>
+                    <p style="margin:4px 0;"><strong>⏰ Received:</strong> {{ request.created_at.strftime('%Y-%m-%d %H:%M') if request.created_at else 'Just now' }}</p>
+                    <div style="margin-top: 12px; display: flex; gap: 8px; flex-wrap: wrap;">
+                        <a href="/fill-soil-report?request_id={{ request._id }}&farmer={{ request.farmer_name }}" style="background:#52c41a;color:#fff;border:none;padding:6px 12px;border-radius:4px;cursor:pointer;text-decoration:none;font-size:0.9em;">📋 Fill Form</a>
+                        <a href="/update-soil-report/{{ request._id }}" style="background:#faad14;color:#fff;border:none;padding:6px 12px;border-radius:4px;cursor:pointer;text-decoration:none;font-size:0.9em;">✏️ Update</a>
+                        <form action="/respond-to-soil-request/{{ request._id }}" method="post" style="display:inline;">
+                            <input type="hidden" name="response_type" value="contacted">
+                            <button type="submit" style="background:#1890ff;color:#fff;border:none;padding:6px 12px;border-radius:4px;cursor:pointer;font-size:0.9em;">📞 Contact</button>
+                        </form>
+                        <form action="/mark-notification-read/{{ request._id }}" method="post" style="display:inline;">
+                            <button type="submit" style="background:#faad14;color:#fff;border:none;padding:6px 12px;border-radius:4px;cursor:pointer;font-size:0.9em;">✓ Mark Read</button>
+                        </form>
+                        <form action="/delete-soil-request/{{ request._id }}" method="post" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this soil analysis request? This action cannot be undone.');">
+                            <button type="submit" style="background:#ff4d4f;color:#fff;border:none;padding:6px 12px;border-radius:4px;cursor:pointer;font-size:0.9em;">🗑️ Delete</button>
+                        </form>
+                    </div>
+                </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+            
+            <!-- Processing Soil Requests -->
+            <h4 style="color:#1890ff; margin-top:18px;">🔄 Processing</h4>
+            <div style="display: flex; flex-wrap: wrap; gap: 18px;">
+                {% for request in soil_requests %}
+                {% if request.agent_response == 'accepted' or request.agent_response == 'contacted' %}
+                <div style="background: #fff; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); padding: 18px 22px; min-width: 270px; max-width: 320px; margin-bottom: 10px; border: 2.5px solid #1890ff; position: relative;">
+                    <input type="checkbox" name="request_ids" value="{{ request._id }}" class="soil-request-checkbox" style="position:absolute;top:10px;left:18px;transform:scale(1.2);" onchange="updateBulkDeleteButton()">
+                    <span style="position:absolute;top:10px;right:18px;padding:4px 12px;border-radius:12px;font-size:0.95em;font-weight:bold;background:#1890ff;color:#fff;">Processing</span>
+                    <h4 style="margin:0 0 8px 0; color:#2a7ae2;">🌱 Soil Analysis - {{ request.farmer_name }}</h4>
+                    <p style="margin:4px 0;"><strong>👨‍🌾 Farmer:</strong> {{ request.farmer_name }}</p>
+                    <p style="margin:4px 0;"><strong>📱 Phone:</strong> {{ request.farmer_phone }}</p>
+                    <p style="margin:4px 0;"><strong>📍 Address:</strong> {{ request.farmer_address }}</p>
+                    <p style="margin:4px 0;"><strong>🌾 Crop:</strong> {{ request.crop_intention if request.crop_intention else 'Not specified' }}</p>
+                    <p style="margin:4px 0;"><strong>📅 Started:</strong> {{ request.responded_at.strftime('%Y-%m-%d %H:%M') if request.responded_at else '' }}</p>
+                    <div style="margin-top: 12px; display: flex; gap: 8px; flex-wrap: wrap;">
+                        <a href="/fill-soil-report?request_id={{ request._id }}&farmer={{ request.farmer_name }}" style="background:#52c41a;color:#fff;border:none;padding:6px 12px;border-radius:4px;cursor:pointer;text-decoration:none;font-size:0.9em;">📋 Fill Form</a>
+                        <a href="/update-soil-report/{{ request._id }}" style="background:#faad14;color:#fff;border:none;padding:6px 12px;border-radius:4px;cursor:pointer;text-decoration:none;font-size:0.9em;">✏️ Update</a>
+                        <form action="/respond-to-soil-request/{{ request._id }}" method="post" style="display:inline;">
+                            <input type="hidden" name="response_type" value="contacted">
+                            <button type="submit" style="background:#1890ff;color:#fff;border:none;padding:6px 12px;border-radius:4px;cursor:pointer;font-size:0.9em;">📞 Contact</button>
+                        </form>
+                        <form action="/delete-soil-request/{{ request._id }}" method="post" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this soil analysis request? This action cannot be undone.');">
+                            <button type="submit" style="background:#ff4d4f;color:#fff;border:none;padding:6px 12px;border-radius:4px;cursor:pointer;font-size:0.9em;">🗑️ Delete</button>
+                        </form>
+                    </div>
+                </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+            
+            <!-- Completed Soil Requests -->
+            <h4 style="color:#52c41a; margin-top:18px;">✅ Completed</h4>
+            <div style="display: flex; flex-wrap: wrap; gap: 18px;">
+                {% for request in soil_requests %}
+                {% if request.is_read and request.agent_response == 'scheduled' %}
+                <div style="background: #fff; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); padding: 18px 22px; min-width: 270px; max-width: 320px; margin-bottom: 10px; border: 2.5px solid #52c41a; position: relative;">
+                    <input type="checkbox" name="request_ids" value="{{ request._id }}" class="soil-request-checkbox" style="position:absolute;top:10px;left:18px;transform:scale(1.2);" onchange="updateBulkDeleteButton()">
+                    <span style="position:absolute;top:10px;right:18px;padding:4px 12px;border-radius:12px;font-size:0.95em;font-weight:bold;background:#52c41a;color:#fff;">Completed</span>
+                    <h4 style="margin:0 0 8px 0; color:#2a7ae2;">✅ Soil Analysis Complete - {{ request.farmer_name }}</h4>
+                    <p style="margin:4px 0;"><strong>👨‍🌾 Farmer:</strong> {{ request.farmer_name }}</p>
+                    <p style="margin:4px 0;"><strong>📱 Phone:</strong> {{ request.farmer_phone }}</p>
+                    <p style="margin:4px 0;"><strong>🌾 Crop:</strong> {{ request.crop_intention if request.crop_intention else 'Not specified' }}</p>
+                    <p style="margin:4px 0;"><strong>✅ Completed:</strong> {{ request.responded_at.strftime('%Y-%m-%d %H:%M') if request.responded_at else '' }}</p>
+                    <div style="margin-top: 12px; display: flex; gap: 8px; flex-wrap: wrap;">
+                        <a href="/view-soil-report/{{ request._id }}" style="background:#52c41a;color:#fff;border:none;padding:6px 12px;border-radius:4px;cursor:pointer;text-decoration:none;font-size:0.9em;">👁️ View Report</a>
+                        <a href="/update-soil-report/{{ request._id }}" style="background:#faad14;color:#fff;border:none;padding:6px 12px;border-radius:4px;cursor:pointer;text-decoration:none;font-size:0.9em;">✏️ Update</a>
+                        <form action="/delete-soil-request/{{ request._id }}" method="post" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this soil analysis request? This action cannot be undone.');">
+                            <button type="submit" style="background:#ff4d4f;color:#fff;border:none;padding:6px 12px;border-radius:4px;cursor:pointer;font-size:0.9em;">🗑️ Delete</button>
+                        </form>
+                    </div>
+                </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        
+        <div class="nav-btns">
+            <a href="/profile">Profile</a>
+            <a href="/soilagent">🌱 Soil Dashboard</a>
+            <a href="/logout">Logout</a>
+        </div>
+    </div>
+
+    <script>
+        // Bulk selection functionality for soil requests
+        function selectAllSoilRequests() {
+            const checkboxes = document.querySelectorAll('.soil-request-checkbox');
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = true;
+            });
+            updateBulkDeleteButton();
+        }
+
+        function clearAllSoilRequests() {
+            const checkboxes = document.querySelectorAll('.soil-request-checkbox');
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = false;
+            });
+            updateBulkDeleteButton();
+        }
+
+        function updateBulkDeleteButton() {
+            const checkboxes = document.querySelectorAll('.soil-request-checkbox');
+            const checkedBoxes = document.querySelectorAll('.soil-request-checkbox:checked');
+            const bulkDeleteBtn = document.getElementById('bulkDeleteBtn');
+            
+            if (checkedBoxes.length > 0) {
+                bulkDeleteBtn.style.display = 'inline-block';
+                bulkDeleteBtn.textContent = `🗑️ Delete Selected (${checkedBoxes.length})`;
+            } else {
+                bulkDeleteBtn.style.display = 'none';
+            }
+        }
+
+        // Enhanced delete confirmation
+        function confirmDelete(action) {
+            return confirm(`Are you sure you want to ${action}? This action cannot be undone.`);
+        }
+
+        // Auto-refresh notifications every 30 seconds
+        setInterval(() => {
+            fetch('/check-new-notifications')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.new_notifications > 0) {
+                        location.reload(); // Refresh page to show new notifications
+                    }
+                })
+                .catch(error => console.error('Error checking notifications:', error));
+        }, 30000);
+    </script>
+</body>
+</html> 

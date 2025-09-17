@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Telangana Agri Agents</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f6f8;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    #searchInput {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 30px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+    }
+
+    .card {
+      background-color: white;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      transition: transform 0.2s;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+    }
+
+    .card h3 {
+      margin: 0 0 10px;
+    }
+
+    .card p {
+      margin: 5px 0;
+      color: #333;
+    }
+
+    @media (max-width: 600px) {
+      #searchInput {
+        font-size: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<h1>🌾 Telangana Agri Agents Directory</h1>
+<input type="text" id="searchInput" placeholder="Search by district, name or email...">
+
+<div class="grid" id="agentGrid">
+  <!-- Sample Card -->
+  <a href="/addcrop?agent_email=ramesh.adilabad@agri.com" class="card" style="text-decoration:none;color:inherit;">
+    <h3>Ramesh Yadav</h3>
+    <p>📍 Adilabad</p>
+    <p>📞 9876543201</p>
+    <p>📧 ramesh.adilabad@agri.com</p>
+  </a>
+
+  <a href="/addcrop?agent_email=sushma.kothagudem@agri.com" class="card" style="text-decoration:none;color:inherit;">
+    <h3>Sushma Reddy</h3>
+    <p>📍 Bhadradri Kothagudem</p>
+    <p>📞 9876543202</p>
+    <p>📧 sushma.kothagudem@agri.com</p>
+  </a>
+
+  <a href="/addcrop?agent_email=praveen.hanamkonda@agri.com" class="card" style="text-decoration:none;color:inherit;">
+    <h3>Praveen Kumar</h3>
+    <p>📍 Hanamkonda</p>
+    <p>📞 9876543203</p>
+    <p>📧 praveen.hanamkonda@agri.com</p>
+  </a>
+
+  <!-- Add remaining 30 districts below, all as <a href="/addcrop" class="card"> ... </a> -->
+  <a href="/addcrop?agent_email=kavitha.hyderabad@agri.com" class="card" style="text-decoration:none;color:inherit;"><h3>Kavitha Laxmi</h3><p>📍 Hyderabad</p><p>📞 9876543204</p><p>📧 kavitha.hyderabad@agri.com</p></a>
+  <a href="/addcrop?agent_email=sandeep.jagtial@agri.com" class="card" style="text-decoration:none;color:inherit;"><h3>Sandeep Naik</h3><p>📍 Jagtial</p><p>📞 9876543205</p><p>📧 sandeep.jagtial@agri.com</p></a>
+  <a href="/addcrop?agent_email=divya.jangaon@agri.com" class="card" style="text-decoration:none;color:inherit;"><h3>Divya Chary</h3><p>📍 Jangaon</p><p>📞 9876543206</p><p>📧 divya.jangaon@agri.com</p></a>
+  <a href="/addcrop?agent_email=srikanth.bhupalapally@agri.com" class="card" style="text-decoration:none;color:inherit;"><h3>Srikanth Goud</h3><p>📍 Jayashankar Bhupalapally</p><p>📞 9876543207</p><p>📧 srikanth.bhupalapally@agri.com</p></a>
+  <a href="/addcrop?agent_email=bhavana.gadwal@agri.com" class="card" style="text-decoration:none;color:inherit;"><h3>Bhavana Patil</h3><p>📍 Jogulamba Gadwal</p><p>📞 9876543208</p><p>📧 bhavana.gadwal@agri.com</p></a>
+  <a href="/addcrop?agent_email=rafi.kamareddy@agri.com" class="card" style="text-decoration:none;color:inherit;"><h3>Rafiuddin Shaik</h3><p>📍 Kamareddy</p><p>📞 9876543209</p><p>📧 rafi.kamareddy@agri.com</p></a>
+  <a href="/addcrop?agent_email=venu.karimnagar@agri.com" class="card" style="text-decoration:none;color:inherit;"><h3>Venu Madhav</h3><p>📍 Karimnagar</p><p>📞 9876543210</p><p>📧 venu.karimnagar@agri.com</p></a>
+  <a href="/addcrop?agent_email=swapna.khammam@agri.com" class="card" style="text-decoration:none;color:inherit;"><h3>Swapna Rao</h3><p>📍 Khammam</p><p>📞 9876543211</p><p>📧 swapna.khammam@agri.com</p></a>
+  <a href="/addcrop?agent_email=rajeshwar.kb@agri.com" class="card" style="text-decoration:none;color:inherit;"><h3>Rajeshwar Goud</h3><p>📍 Komaram Bheem Asifabad</p><p>📞 9876543212</p><p>📧 rajeshwar.kb@agri.com</p></a>
+  <a href="/addcrop?agent_email=anjali.mahabubabad@agri.com" class="card" style="text-decoration:none;color:inherit;"><h3>Anjali Sharma</h3><p>📍 Mahabubabad</p><p>📞 9876543213</p><p>📧 anjali.mahabubabad@agri.com</p></a>
+  <a href="/addcrop?agent_email=srinivas.mbnr@agri.com" class="card" style="text-decoration:none;color:inherit;"><h3>Srinivas Rao</h3><p>📍 Mahabubnagar</p><p>📞 9876543214</p><p>📧 srinivas.mbnr@agri.com</p></a>
+  <a href="/addcrop?agent_email=farida.mancherial@agri.com" class="card" style="text-decoration:none;color:inherit;"><h3>Farida Begum</h3><p>📍 Mancherial</p><p>📞 9876543215</p><p>📧 farida.mancherial@agri.com</p></a>
+  <a href="/addcrop?agent_email=ganesh.medak@agri.com" class="card" style="text-decoration:none;color:inherit;"><h3>Ganesh Reddy</h3><p>📍 Medak</p><p>📞 9876543216</p><p>📧 ganesh.medak@agri.com</p></a>
+  <a href="/addcrop?agent_email=chandana.medchal@agri.com" class="card" style="text-decoration:none;color:inherit;"><h3>Chandana Das</h3><p>📍 Medchal-Malkajgiri</p><p>📞 9876543217</p><p>📧 chandana.medchal@agri.com</p></a>
+  <a href="/addcrop?agent_email=vijay.mulugu@agri.com" class="card" style="text-decoration:none;color:inherit;"><h3>Vijay Singh</h3><p>📍 Mulugu</p><p>📞 9876543218</p><p>📧 vijay.mulugu@agri.com</p></a>
+  <a href="/addcrop?agent_email=laxman.nagarkurnool@agri.com" class="card" style="text-decoration:none;color:inherit;"><h3>Laxman B</h3><p>📍 Nagarkurnool</p><p>📞 9876543219</p><p>📧 laxman.nagarkurnool@agri.com</p></a>
+  <a href="/addcrop?agent_email=padma.nalgonda@agri.com" class="card" style="text-decoration:none;color:inherit;"><h3>Padma S</h3><p>📍 Nalgonda</p><p>📞 9876543220</p><p>📧 padma.nalgonda@agri.com</p></a>
+  <a href="/addcrop?agent_email=naresh.narayanpet@agri.com" class="card" style="text-decoration:none;color:inherit;"><h3>Naresh P</h3><p>📍 Narayanpet</p><p>📞 9876543221</p><p>📧 naresh.narayanpet@agri.com</p></a>
+  <a href="/addcrop?agent_email=saiteja.nirmal@agri.com" class="card" style="text-decoration:none;color:inherit;"><h3>Sai Teja</h3><p>📍 Nirmal</p><p>📞 9876543222</p><p>📧 saiteja.nirmal@agri.com</p></a>
+  <a href="/addcrop?agent_email=lavanya.nizamabad@agri.com" class="card" style="text-decoration:none;color:inherit;"><h3>Lavanya K</h3><p>📍 Nizamabad</p><p>📞 9876543223</p><p>📧 lavanya.nizamabad@agri.com</p></a>
+  <a href="/addcrop?agent_email=sruthi.peddapalli@agri.com" class="card" style="text-decoration:none;color:inherit;"><h3>Sruthi V</h3><p>📍 Peddapalli</p><p>📞 9876543224</p><p>📧 sruthi.peddapalli@agri.com</p></a>
+  <a href="/addcrop?agent_email=nagaraju.sircilla@agri.com" class="card" style="text-decoration:none;color:inherit;"><h3>Nagaraju T</h3><p>📍 Rajanna Sircilla</p><p>📞 9876543225</p><p>📧 nagaraju.sircilla@agri.com</p></a>
+  <a href="/addcrop?agent_email=meena.rangareddy@agri.com" class="card" style="text-decoration:none;color:inherit;"><h3>Meena Kumari</h3><p>📍 Rangareddy</p><p>📞 9876543226</p><p>📧 meena.rangareddy@agri.com</p></a>
+  <a href="/addcrop?agent_email=kiran.sangareddy@agri.com" class="card" style="text-decoration:none;color:inherit;"><h3>Kiran R</h3><p>📍 Sangareddy</p><p>📞 9876543227</p><p>📧 kiran.sangareddy@agri.com</p></a>
+  <a href="/addcrop?agent_email=tejaswini.siddipet@agri.com" class="card" style="text-decoration:none;color:inherit;"><h3>Tejaswini D</h3><p>📍 Siddipet</p><p>📞 9876543228</p><p>📧 tejaswini.siddipet@agri.com</p></a>
+  <a href="/addcrop?agent_email=akhil.suryapet@agri.com" class="card" style="text-decoration:none;color:inherit;"><h3>Akhil M</h3><p>📍 Suryapet</p><p>📞 9876543229</p><p>📧 akhil.suryapet@agri.com</p></a>
+  <a href="/addcrop?agent_email=harsha.vikarabad@agri.com" class="card" style="text-decoration:none;color:inherit;"><h3>Harsha V</h3><p>📍 Vikarabad</p><p>📞 9876543230</p><p>📧 harsha.vikarabad@agri.com</p></a>
+  <a href="/addcrop?agent_email=deepthi.wanaparthy@agri.com" class="card" style="text-decoration:none;color:inherit;"><h3>Deepthi J</h3><p>📍 Wanaparthy</p><p>📞 9876543231</p><p>📧 deepthi.wanaparthy@agri.com</p></a>
+  <a href="/addcrop?agent_email=anand.warangal@agri.com" class="card" style="text-decoration:none;color:inherit;"><h3>Anand Rao</h3><p>📍 Warangal</p><p>📞 9876543232</p><p>📧 anand.warangal@agri.com</p></a>
+  <a href="/addcrop?agent_email=shalini.yadadri@agri.com" class="card" style="text-decoration:none;color:inherit;"><h3>Shalini B</h3><p>📍 Yadadri Bhuvanagiri</p><p>📞 9876543233</p><p>📧 shalini.yadadri@agri.com</p></a>
+</div>
+
+<script>
+  const input = document.getElementById("searchInput");
+  const cards = document.querySelectorAll(".card");
+
+  input.addEventListener("input", function () {
+    const filter = input.value.toLowerCase();
+    cards.forEach(card => {
+      const text = card.textContent.toLowerCase();
+      card.style.display = text.includes(filter) ? "block" : "none";
+    });
+  });
+</script>
+
+</body>
+</html>

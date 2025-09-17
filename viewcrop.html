@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Accepted Crops</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f4f8fb; margin: 0; }
+        .container { max-width: 1200px; margin: 40px auto; background: #fff; border-radius: 14px; box-shadow: 0 2px 16px rgba(42,122,226,0.10); padding: 36px 32px; }
+        h1 { color: #2a7ae2; margin-bottom: 24px; text-align: center; }
+        .crop-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            list-style: none;
+            padding: 0;
+        }
+        .crop-card {
+            background: #e3f0ff;
+            border-radius: 10px;
+            padding: 18px 24px;
+            box-shadow: 0 2px 8px rgba(42,122,226,0.08);
+        }
+        .crop-card strong { color: #2a7ae2; font-size: 1.2em; }
+        .label { color: #888; font-weight: bold; margin-right: 8px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Accepted Crops</h1>
+        <ul class="crop-grid">
+            {% for crop in crops %}
+            <li class="crop-card">
+                <div><span class="label">Crop Name:</span> <strong>{{ crop.cropname }}</strong></div>
+                <div><span class="label">Quantity:</span> {{ crop.quantity }} kg</div>
+                <div><span class="label">Seller Name:</span> {{ crop.seller_name }}</div>
+                <div><span class="label">Place:</span> {{ crop.place }}</div>
+                <div><span class="label">Phone:</span> {{ crop.phone }}</div>
+                <div><span class="label">Accepted By Agent:</span> {{ crop.accepted_by_agent if crop.accepted_by_agent else crop.agent_email }}</div>
+                <form action="/buy_crop/{{ crop._id }}" method="get" style="margin-top:12px;">
+                    <button type="submit" style="background:#2a7ae2;color:#fff;padding:10px 22px;border:none;border-radius:8px;font-size:1em;cursor:pointer;">Buy</button>
+                </form>
+            </li>
+            {% else %}
+            <li>No accepted crops yet.</li>
+            {% endfor %}
+        </ul>
+    </div>
+</body>
+</html>
