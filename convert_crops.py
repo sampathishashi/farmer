@@ -133,11 +133,49 @@ def farmer():
         # Get soil analysis requests for this farmer
         soil_requests_list = list(soil_requests.find({'farmer_username': farmer_username}))
         # Get completed soil reports for this farmer
-        soil_reports_list = list(soil_reports.find({'farmer_username': farmer_username}))
+        soil_reports_list = list(soil_reports.find({'farmer_username': farmer_username}).sort('created_at', -1))
+        latest_recommended = []
+        if soil_reports_list:
+            latest = soil_reports_list[0]
+            rec_str = latest.get('recommended_crops')
+            if rec_str:
+                latest_recommended = [c.strip() for c in rec_str.split(',') if c.strip()]
         return render_template('farmer.html', 
                              soil_requests=soil_requests_list,
-                             soil_reports=soil_reports_list)
+                             soil_reports=soil_reports_list,
+                             latest_recommended_crops=latest_recommended)
     return redirect('/login')
+
+@app.route('/save-recommended-crops', methods=['POST'])
+def save_recommended_crops():
+    """Allow a farmer to select and save preferred crops from recommendations."""
+    if session.get('type') != 'farmer':
+        return redirect('/login')
+
+    farmer_username = session.get('username')
+    report_id = request.form.get('report_id')
+    selected_crops = request.form.getlist('selected_crops')
+
+    if not report_id:
+        flash('Invalid request: missing report id')
+        return redirect('/farmer')
+
+    try:
+        report = soil_reports.find_one({'_id': ObjectId(report_id), 'farmer_username': farmer_username})
+        if not report:
+            flash('Report not found')
+            return redirect('/farmer')
+
+        soil_reports.update_one(
+            {'_id': ObjectId(report_id)},
+            {'$set': {'farmer_selected_crops': selected_crops}}
+        )
+
+        flash('Your crop selections have been saved.')
+    except Exception as e:
+        flash(f'Failed to save selections: {str(e)}')
+
+    return redirect('/farmer')
 
 @app.route('/soilreport')
 def soilreport():
