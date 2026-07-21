@@ -1,135 +1,726 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Telangana Agri Agents</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f4f6f8;
-      padding: 20px;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agents Directory — AgriConnect</title>
+    <!-- Premium Typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;0,900;1,900&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            /* Consistent Theme Variables */
+            --bg-deep: #020617;
+            --accent-primary: #6366f1; /* Indigo */
+            --accent-harvest: #fbbf24; /* Amber/Harvest */
+            --accent-success: #10b981; /* Emerald */
+            
+            --glass-bg: rgba(30, 41, 59, 0.4);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-shine: rgba(255, 255, 255, 0.05);
+            
+            --text-main: #f8fafc;
+            --text-dim: #94a3b8;
+            
+            --radius-xl: 32px;
+            --radius-lg: 24px;
+            --radius-md: 16px;
+            --shadow-card: 0 4px 30px rgba(0, 0, 0, 0.3);
+            --ease: cubic-bezier(0.23, 1, 0.32, 1);
+        }
 
-    h1 {
-      text-align: center;
-      margin-bottom: 20px;
-    }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-deep);
+            background-image: 
+                radial-gradient(circle at 15% 50%, rgba(99, 102, 241, 0.12) 0px, transparent 40%),
+                radial-gradient(circle at 85% 30%, rgba(16, 185, 129, 0.08) 0px, transparent 40%);
+            background-attachment: fixed;
+            color: var(--text-main);
+            overflow-x: hidden;
+            min-height: 100vh;
+            padding-bottom: 60px;
+        }
 
-    #searchInput {
-      width: 100%;
-      padding: 10px;
-      margin-bottom: 30px;
-      font-size: 16px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-    }
+        /* Noise Texture */
+        body::before {
+            content: "";
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
+            pointer-events: none; z-index: -1;
+        }
 
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 20px;
-    }
+        /* --- Layout --- */
+        .dashboard-wrapper {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 24px;
+        }
 
-    .card {
-      background-color: white;
-      border-radius: 12px;
-      padding: 20px;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-      transition: transform 0.2s;
-    }
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
+        }
 
-    .card:hover {
-      transform: translateY(-5px);
-    }
+        .card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-top: 1px solid rgba(255,255,255,0.1);
+            border-radius: var(--radius-xl);
+            padding: 30px;
+            box-shadow: var(--shadow-card);
+            position: relative;
+            overflow: hidden;
+        }
 
-    .card h3 {
-      margin: 0 0 10px;
-    }
+        .span-full { grid-column: span 4; }
+        .col-span-1 { grid-column: span 1; }
 
-    .card p {
-      margin: 5px 0;
-      color: #333;
-    }
+        /* --- Hero Section --- */
+        .hero-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            background: linear-gradient(180deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.6));
+        }
 
-    @media (max-width: 600px) {
-      #searchInput {
-        font-size: 14px;
-      }
-    }
-  </style>
+        .hero-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 3rem;
+            font-weight: 900;
+            margin-bottom: 10px;
+            background: linear-gradient(to right, #fff, var(--text-dim));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .hero-title span { color: var(--accent-harvest); font-style: italic; -webkit-text-fill-color: var(--accent-harvest); }
+        
+        .hero-sub { color: var(--text-dim); font-size: 1.1rem; margin-bottom: 30px; }
+
+        /* --- Search Bar --- */
+        .search-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+        }
+        .search-icon {
+            position: absolute; left: 20px; top: 50%;
+            transform: translateY(-50%); color: var(--text-dim); font-size: 1.2rem;
+        }
+        .search-box {
+            width: 100%; padding: 16px 20px 16px 54px;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--glass-border);
+            border-radius: 50px;
+            color: white;
+            font-family: 'Outfit', sans-serif;
+            font-size: 1rem;
+            transition: 0.3s;
+            outline: none;
+        }
+        .search-box:focus {
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15);
+            background: rgba(0,0,0,0.5);
+        }
+
+        /* --- Stats Row --- */
+        .stats-row {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 25px;
+            flex-wrap: wrap;
+        }
+        .stat-pill {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 8px 20px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .stat-pill span { color: var(--accent-success); font-family: 'Playfair Display', serif; font-size: 1.1rem; }
+
+        /* --- Agents Grid --- */
+        .agents-container {
+            grid-column: span 4;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 24px;
+        }
+
+        .agent-card {
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-lg);
+            padding: 25px;
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.4s var(--ease);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Hover Effect */
+        .agent-card::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%;
+            background: linear-gradient(to bottom, var(--accent-primary), var(--accent-success));
+            opacity: 0; transition: 0.3s;
+        }
+        .agent-card:hover {
+            transform: translateY(-8px);
+            background: rgba(30, 41, 59, 0.9);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            border-color: rgba(99, 102, 241, 0.3);
+        }
+        .agent-card:hover::before { opacity: 1; }
+
+        /* Agent Top Section */
+        .agent-top { display: flex; align-items: center; gap: 16px; }
+        .agent-avatar {
+            width: 60px; height: 60px; border-radius: 16px;
+            background: linear-gradient(135deg, var(--accent-primary), #4338ca);
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-weight: 900; font-size: 1.4rem;
+            font-family: 'Playfair Display', serif;
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
+            flex-shrink: 0;
+        }
+        .agent-info { display: flex; flex-direction: column; }
+        .agent-name { font-weight: 700; font-size: 1.1rem; color: #fff; margin-bottom: 4px; }
+        .agent-district {
+            font-size: 0.85rem; color: var(--text-dim);
+            background: rgba(255,255,255,0.05);
+            padding: 4px 10px; border-radius: 6px; display: inline-block;
+            width: fit-content;
+        }
+
+        /* Agent Details */
+        .agent-details { display: flex; flex-direction: column; gap: 8px; }
+        .agent-detail { font-size: 0.9rem; color: var(--text-dim); display: flex; align-items: center; gap: 10px; }
+        .agent-detail i { color: var(--accent-primary); width: 16px; text-align: center; }
+
+        /* CTA Button */
+        .agent-cta {
+            margin-top: auto;
+            background: transparent;
+            border: 1px solid var(--glass-border);
+            color: var(--text-main);
+            text-align: center;
+            padding: 12px;
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: 0.3s;
+            display: flex; justify-content: center; align-items: center; gap: 8px;
+        }
+        .agent-card:hover .agent-cta {
+            background: linear-gradient(135deg, var(--accent-primary), #4338ca);
+            border-color: transparent;
+            color: white;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+        }
+
+        /* No Results */
+        .no-results { 
+            grid-column: span 4; text-align: center; padding: 60px; 
+            color: var(--text-dim); display: none; 
+        }
+        .no-results i { font-size: 3rem; margin-bottom: 15px; opacity: 0.5; color: var(--accent-primary); }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .bento-grid { grid-template-columns: repeat(2, 1fr); }
+            .span-full { grid-column: span 2; }
+            .agents-container { grid-column: span 2; }
+        }
+        @media (max-width: 768px) {
+            .bento-grid { grid-template-columns: 1fr; }
+            .span-full { grid-column: span 1; }
+            .agents-container { grid-column: span 1; }
+            .hero-title { font-size: 2rem; }
+        }
+    </style>
 </head>
 <body>
 
-<h1>🌾 Telangana Agri Agents Directory</h1>
-<input type="text" id="searchInput" placeholder="Search by district, name or email...">
+<div class="dashboard-wrapper">
+    
+    <div class="bento-grid">
+        
+        <!-- HERO CARD -->
+        <div class="card hero-card span-full">
+            <h1 class="hero-title">Telangana Agri <span>Agents</span></h1>
+            <p class="hero-sub">33 districts covered · Connect with your local agricultural expert</p>
+            
+            <div class="search-wrapper">
+                <span class="search-icon"><i class="fas fa-search"></i></span>
+                <input class="search-box" id="searchInput" placeholder="Search by district, name, or email...">
+            </div>
 
-<div class="grid" id="agentGrid">
-  <!-- Sample Card -->
-  <a href="/addcrop?agent_email=ramesh.adilabad@agri.com" class="card" style="text-decoration:none;color:inherit;">
-    <h3>Ramesh Yadav</h3>
-    <p>📍 Adilabad</p>
-    <p>📞 9876543201</p>
-    <p>📧 ramesh.adilabad@agri.com</p>
-  </a>
+            <div class="stats-row">
+                <div class="stat-pill"><span>33</span> Districts</div>
+                <div class="stat-pill"><span>33</span> Active Agents</div>
+                <div class="stat-pill"><span>🟢</span> All Available</div>
+            </div>
+        </div>
 
-  <a href="/addcrop?agent_email=sushma.kothagudem@agri.com" class="card" style="text-decoration:none;color:inherit;">
-    <h3>Sushma Reddy</h3>
-    <p>📍 Bhadradri Kothagudem</p>
-    <p>📞 9876543202</p>
-    <p>📧 sushma.kothagudem@agri.com</p>
-  </a>
+        <!-- AGENTS GRID CONTAINER -->
+        <div class="agents-container" id="agentGrid">
 
-  <a href="/addcrop?agent_email=praveen.hanamkonda@agri.com" class="card" style="text-decoration:none;color:inherit;">
-    <h3>Praveen Kumar</h3>
-    <p>📍 Hanamkonda</p>
-    <p>📞 9876543203</p>
-    <p>📧 praveen.hanamkonda@agri.com</p>
-  </a>
+            <a href="/addcrop?agent_email=ramesh.adilabad@agri.com" class="agent-card" data-search="ramesh yadav adilabad">
+                <div class="agent-top">
+                    <div class="agent-avatar">R</div>
+                    <div class="agent-info">
+                        <div class="agent-name">Ramesh Yadav</div>
+                        <div class="agent-district"><i class="fas fa-map-marker-alt"></i> Adilabad</div>
+                    </div>
+                </div>
+                <div class="agent-details">
+                    <div class="agent-detail"><i class="fas fa-phone"></i> 9876543201</div>
+                    <div class="agent-detail"><i class="fas fa-envelope"></i> ramesh@agri.com</div>
+                </div>
+                <div class="agent-cta">List Your Crop <i class="fas fa-arrow-right"></i></div>
+            </a>
 
-  <!-- Add remaining 30 districts below, all as <a href="/addcrop" class="card"> ... </a> -->
-  <a href="/addcrop?agent_email=kavitha.hyderabad@agri.com" class="card" style="text-decoration:none;color:inherit;"><h3>Kavitha Laxmi</h3><p>📍 Hyderabad</p><p>📞 9876543204</p><p>📧 kavitha.hyderabad@agri.com</p></a>
-  <a href="/addcrop?agent_email=sandeep.jagtial@agri.com" class="card" style="text-decoration:none;color:inherit;"><h3>Sandeep Naik</h3><p>📍 Jagtial</p><p>📞 9876543205</p><p>📧 sandeep.jagtial@agri.com</p></a>
-  <a href="/addcrop?agent_email=divya.jangaon@agri.com" class="card" style="text-decoration:none;color:inherit;"><h3>Divya Chary</h3><p>📍 Jangaon</p><p>📞 9876543206</p><p>📧 divya.jangaon@agri.com</p></a>
-  <a href="/addcrop?agent_email=srikanth.bhupalapally@agri.com" class="card" style="text-decoration:none;color:inherit;"><h3>Srikanth Goud</h3><p>📍 Jayashankar Bhupalapally</p><p>📞 9876543207</p><p>📧 srikanth.bhupalapally@agri.com</p></a>
-  <a href="/addcrop?agent_email=bhavana.gadwal@agri.com" class="card" style="text-decoration:none;color:inherit;"><h3>Bhavana Patil</h3><p>📍 Jogulamba Gadwal</p><p>📞 9876543208</p><p>📧 bhavana.gadwal@agri.com</p></a>
-  <a href="/addcrop?agent_email=rafi.kamareddy@agri.com" class="card" style="text-decoration:none;color:inherit;"><h3>Rafiuddin Shaik</h3><p>📍 Kamareddy</p><p>📞 9876543209</p><p>📧 rafi.kamareddy@agri.com</p></a>
-  <a href="/addcrop?agent_email=venu.karimnagar@agri.com" class="card" style="text-decoration:none;color:inherit;"><h3>Venu Madhav</h3><p>📍 Karimnagar</p><p>📞 9876543210</p><p>📧 venu.karimnagar@agri.com</p></a>
-  <a href="/addcrop?agent_email=swapna.khammam@agri.com" class="card" style="text-decoration:none;color:inherit;"><h3>Swapna Rao</h3><p>📍 Khammam</p><p>📞 9876543211</p><p>📧 swapna.khammam@agri.com</p></a>
-  <a href="/addcrop?agent_email=rajeshwar.kb@agri.com" class="card" style="text-decoration:none;color:inherit;"><h3>Rajeshwar Goud</h3><p>📍 Komaram Bheem Asifabad</p><p>📞 9876543212</p><p>📧 rajeshwar.kb@agri.com</p></a>
-  <a href="/addcrop?agent_email=anjali.mahabubabad@agri.com" class="card" style="text-decoration:none;color:inherit;"><h3>Anjali Sharma</h3><p>📍 Mahabubabad</p><p>📞 9876543213</p><p>📧 anjali.mahabubabad@agri.com</p></a>
-  <a href="/addcrop?agent_email=srinivas.mbnr@agri.com" class="card" style="text-decoration:none;color:inherit;"><h3>Srinivas Rao</h3><p>📍 Mahabubnagar</p><p>📞 9876543214</p><p>📧 srinivas.mbnr@agri.com</p></a>
-  <a href="/addcrop?agent_email=farida.mancherial@agri.com" class="card" style="text-decoration:none;color:inherit;"><h3>Farida Begum</h3><p>📍 Mancherial</p><p>📞 9876543215</p><p>📧 farida.mancherial@agri.com</p></a>
-  <a href="/addcrop?agent_email=ganesh.medak@agri.com" class="card" style="text-decoration:none;color:inherit;"><h3>Ganesh Reddy</h3><p>📍 Medak</p><p>📞 9876543216</p><p>📧 ganesh.medak@agri.com</p></a>
-  <a href="/addcrop?agent_email=chandana.medchal@agri.com" class="card" style="text-decoration:none;color:inherit;"><h3>Chandana Das</h3><p>📍 Medchal-Malkajgiri</p><p>📞 9876543217</p><p>📧 chandana.medchal@agri.com</p></a>
-  <a href="/addcrop?agent_email=vijay.mulugu@agri.com" class="card" style="text-decoration:none;color:inherit;"><h3>Vijay Singh</h3><p>📍 Mulugu</p><p>📞 9876543218</p><p>📧 vijay.mulugu@agri.com</p></a>
-  <a href="/addcrop?agent_email=laxman.nagarkurnool@agri.com" class="card" style="text-decoration:none;color:inherit;"><h3>Laxman B</h3><p>📍 Nagarkurnool</p><p>📞 9876543219</p><p>📧 laxman.nagarkurnool@agri.com</p></a>
-  <a href="/addcrop?agent_email=padma.nalgonda@agri.com" class="card" style="text-decoration:none;color:inherit;"><h3>Padma S</h3><p>📍 Nalgonda</p><p>📞 9876543220</p><p>📧 padma.nalgonda@agri.com</p></a>
-  <a href="/addcrop?agent_email=naresh.narayanpet@agri.com" class="card" style="text-decoration:none;color:inherit;"><h3>Naresh P</h3><p>📍 Narayanpet</p><p>📞 9876543221</p><p>📧 naresh.narayanpet@agri.com</p></a>
-  <a href="/addcrop?agent_email=saiteja.nirmal@agri.com" class="card" style="text-decoration:none;color:inherit;"><h3>Sai Teja</h3><p>📍 Nirmal</p><p>📞 9876543222</p><p>📧 saiteja.nirmal@agri.com</p></a>
-  <a href="/addcrop?agent_email=lavanya.nizamabad@agri.com" class="card" style="text-decoration:none;color:inherit;"><h3>Lavanya K</h3><p>📍 Nizamabad</p><p>📞 9876543223</p><p>📧 lavanya.nizamabad@agri.com</p></a>
-  <a href="/addcrop?agent_email=sruthi.peddapalli@agri.com" class="card" style="text-decoration:none;color:inherit;"><h3>Sruthi V</h3><p>📍 Peddapalli</p><p>📞 9876543224</p><p>📧 sruthi.peddapalli@agri.com</p></a>
-  <a href="/addcrop?agent_email=nagaraju.sircilla@agri.com" class="card" style="text-decoration:none;color:inherit;"><h3>Nagaraju T</h3><p>📍 Rajanna Sircilla</p><p>📞 9876543225</p><p>📧 nagaraju.sircilla@agri.com</p></a>
-  <a href="/addcrop?agent_email=meena.rangareddy@agri.com" class="card" style="text-decoration:none;color:inherit;"><h3>Meena Kumari</h3><p>📍 Rangareddy</p><p>📞 9876543226</p><p>📧 meena.rangareddy@agri.com</p></a>
-  <a href="/addcrop?agent_email=kiran.sangareddy@agri.com" class="card" style="text-decoration:none;color:inherit;"><h3>Kiran R</h3><p>📍 Sangareddy</p><p>📞 9876543227</p><p>📧 kiran.sangareddy@agri.com</p></a>
-  <a href="/addcrop?agent_email=tejaswini.siddipet@agri.com" class="card" style="text-decoration:none;color:inherit;"><h3>Tejaswini D</h3><p>📍 Siddipet</p><p>📞 9876543228</p><p>📧 tejaswini.siddipet@agri.com</p></a>
-  <a href="/addcrop?agent_email=akhil.suryapet@agri.com" class="card" style="text-decoration:none;color:inherit;"><h3>Akhil M</h3><p>📍 Suryapet</p><p>📞 9876543229</p><p>📧 akhil.suryapet@agri.com</p></a>
-  <a href="/addcrop?agent_email=harsha.vikarabad@agri.com" class="card" style="text-decoration:none;color:inherit;"><h3>Harsha V</h3><p>📍 Vikarabad</p><p>📞 9876543230</p><p>📧 harsha.vikarabad@agri.com</p></a>
-  <a href="/addcrop?agent_email=deepthi.wanaparthy@agri.com" class="card" style="text-decoration:none;color:inherit;"><h3>Deepthi J</h3><p>📍 Wanaparthy</p><p>📞 9876543231</p><p>📧 deepthi.wanaparthy@agri.com</p></a>
-  <a href="/addcrop?agent_email=anand.warangal@agri.com" class="card" style="text-decoration:none;color:inherit;"><h3>Anand Rao</h3><p>📍 Warangal</p><p>📞 9876543232</p><p>📧 anand.warangal@agri.com</p></a>
-  <a href="/addcrop?agent_email=shalini.yadadri@agri.com" class="card" style="text-decoration:none;color:inherit;"><h3>Shalini B</h3><p>📍 Yadadri Bhuvanagiri</p><p>📞 9876543233</p><p>📧 shalini.yadadri@agri.com</p></a>
+            <a href="/addcrop?agent_email=sushma.kothagudem@agri.com" class="agent-card" data-search="sushma reddy bhadradri kothagudem">
+                <div class="agent-top">
+                    <div class="agent-avatar" style="background: linear-gradient(135deg, var(--accent-success), #059669);">S</div>
+                    <div class="agent-info">
+                        <div class="agent-name">Sushma Reddy</div>
+                        <div class="agent-district"><i class="fas fa-map-marker-alt"></i> Bhadradri Kothagudem</div>
+                    </div>
+                </div>
+                <div class="agent-details">
+                    <div class="agent-detail"><i class="fas fa-phone"></i> 9876543202</div>
+                    <div class="agent-detail"><i class="fas fa-envelope"></i> sushma@agri.com</div>
+                </div>
+                <div class="agent-cta">List Your Crop <i class="fas fa-arrow-right"></i></div>
+            </a>
+
+            <a href="/addcrop?agent_email=praveen.hanamkonda@agri.com" class="agent-card" data-search="praveen kumar hanamkonda">
+                <div class="agent-top">
+                    <div class="agent-avatar">P</div>
+                    <div class="agent-info">
+                        <div class="agent-name">Praveen Kumar</div>
+                        <div class="agent-district"><i class="fas fa-map-marker-alt"></i> Hanamkonda</div>
+                    </div>
+                </div>
+                <div class="agent-details">
+                    <div class="agent-detail"><i class="fas fa-phone"></i> 9876543203</div>
+                    <div class="agent-detail"><i class="fas fa-envelope"></i> praveen@agri.com</div>
+                </div>
+                <div class="agent-cta">List Your Crop <i class="fas fa-arrow-right"></i></div>
+            </a>
+
+            <a href="/addcrop?agent_email=kavitha.hyderabad@agri.com" class="agent-card" data-search="kavitha laxmi hyderabad">
+                <div class="agent-top">
+                    <div class="agent-avatar" style="background: linear-gradient(135deg, var(--accent-harvest), #d97706);">K</div>
+                    <div class="agent-info">
+                        <div class="agent-name">Kavitha Laxmi</div>
+                        <div class="agent-district"><i class="fas fa-map-marker-alt"></i> Hyderabad</div>
+                    </div>
+                </div>
+                <div class="agent-details">
+                    <div class="agent-detail"><i class="fas fa-phone"></i> 9876543204</div>
+                    <div class="agent-detail"><i class="fas fa-envelope"></i> kavitha@agri.com</div>
+                </div>
+                <div class="agent-cta">List Your Crop <i class="fas fa-arrow-right"></i></div>
+            </a>
+
+            <a href="/addcrop?agent_email=sandeep.jagtial@agri.com" class="agent-card" data-search="sandeep naik jagtial">
+                <div class="agent-top">
+                    <div class="agent-avatar">S</div>
+                    <div class="agent-info">
+                        <div class="agent-name">Sandeep Naik</div>
+                        <div class="agent-district"><i class="fas fa-map-marker-alt"></i> Jagtial</div>
+                    </div>
+                </div>
+                <div class="agent-details">
+                    <div class="agent-detail"><i class="fas fa-phone"></i> 9876543205</div>
+                    <div class="agent-detail"><i class="fas fa-envelope"></i> sandeep@agri.com</div>
+                </div>
+                <div class="agent-cta">List Your Crop <i class="fas fa-arrow-right"></i></div>
+            </a>
+
+            <a href="/addcrop?agent_email=divya.jangaon@agri.com" class="agent-card" data-search="divya chary jangaon">
+                <div class="agent-top">
+                    <div class="agent-avatar" style="background: linear-gradient(135deg, var(--accent-success), #059669);">D</div>
+                    <div class="agent-info">
+                        <div class="agent-name">Divya Chary</div>
+                        <div class="agent-district"><i class="fas fa-map-marker-alt"></i> Jangaon</div>
+                    </div>
+                </div>
+                <div class="agent-details">
+                    <div class="agent-detail"><i class="fas fa-phone"></i> 9876543206</div>
+                    <div class="agent-detail"><i class="fas fa-envelope"></i> divya@agri.com</div>
+                </div>
+                <div class="agent-cta">List Your Crop <i class="fas fa-arrow-right"></i></div>
+            </a>
+
+            <a href="/addcrop?agent_email=srikanth.bhupalapally@agri.com" class="agent-card" data-search="srikanth goud jayashankar bhupalapally">
+                <div class="agent-top">
+                    <div class="agent-avatar">S</div>
+                    <div class="agent-info">
+                        <div class="agent-name">Srikanth Goud</div>
+                        <div class="agent-district"><i class="fas fa-map-marker-alt"></i> Jayashankar Bhupalapally</div>
+                    </div>
+                </div>
+                <div class="agent-details">
+                    <div class="agent-detail"><i class="fas fa-phone"></i> 9876543207</div>
+                    <div class="agent-detail"><i class="fas fa-envelope"></i> srikanth@agri.com</div>
+                </div>
+                <div class="agent-cta">List Your Crop <i class="fas fa-arrow-right"></i></div>
+            </a>
+
+            <a href="/addcrop?agent_email=bhavana.gadwal@agri.com" class="agent-card" data-search="bhavana patil jogulamba gadwal">
+                <div class="agent-top">
+                    <div class="agent-avatar" style="background: linear-gradient(135deg, var(--accent-harvest), #d97706);">B</div>
+                    <div class="agent-info">
+                        <div class="agent-name">Bhavana Patil</div>
+                        <div class="agent-district"><i class="fas fa-map-marker-alt"></i> Jogulamba Gadwal</div>
+                    </div>
+                </div>
+                <div class="agent-details">
+                    <div class="agent-detail"><i class="fas fa-phone"></i> 9876543208</div>
+                    <div class="agent-detail"><i class="fas fa-envelope"></i> bhavana@agri.com</div>
+                </div>
+                <div class="agent-cta">List Your Crop <i class="fas fa-arrow-right"></i></div>
+            </a>
+
+            <a href="/addcrop?agent_email=rafi.kamareddy@agri.com" class="agent-card" data-search="rafiuddin shaik kamareddy">
+                <div class="agent-top">
+                    <div class="agent-avatar">R</div>
+                    <div class="agent-info">
+                        <div class="agent-name">Rafiuddin Shaik</div>
+                        <div class="agent-district"><i class="fas fa-map-marker-alt"></i> Kamareddy</div>
+                    </div>
+                </div>
+                <div class="agent-details">
+                    <div class="agent-detail"><i class="fas fa-phone"></i> 9876543209</div>
+                    <div class="agent-detail"><i class="fas fa-envelope"></i> rafi@agri.com</div>
+                </div>
+                <div class="agent-cta">List Your Crop <i class="fas fa-arrow-right"></i></div>
+            </a>
+
+            <a href="/addcrop?agent_email=venu.karimnagar@agri.com" class="agent-card" data-search="venu madhav karimnagar">
+                <div class="agent-top">
+                    <div class="agent-avatar">V</div>
+                    <div class="agent-info">
+                        <div class="agent-name">Venu Madhav</div>
+                        <div class="agent-district"><i class="fas fa-map-marker-alt"></i> Karimnagar</div>
+                    </div>
+                </div>
+                <div class="agent-details">
+                    <div class="agent-detail"><i class="fas fa-phone"></i> 9876543210</div>
+                    <div class="agent-detail"><i class="fas fa-envelope"></i> venu@agri.com</div>
+                </div>
+                <div class="agent-cta">List Your Crop <i class="fas fa-arrow-right"></i></div>
+            </a>
+
+            <a href="/addcrop?agent_email=swapna.khammam@agri.com" class="agent-card" data-search="swapna rao khammam">
+                <div class="agent-top">
+                    <div class="agent-avatar" style="background: linear-gradient(135deg, var(--accent-success), #059669);">S</div>
+                    <div class="agent-info">
+                        <div class="agent-name">Swapna Rao</div>
+                        <div class="agent-district"><i class="fas fa-map-marker-alt"></i> Khammam</div>
+                    </div>
+                </div>
+                <div class="agent-details">
+                    <div class="agent-detail"><i class="fas fa-phone"></i> 9876543211</div>
+                    <div class="agent-detail"><i class="fas fa-envelope"></i> swapna@agri.com</div>
+                </div>
+                <div class="agent-cta">List Your Crop <i class="fas fa-arrow-right"></i></div>
+            </a>
+
+            <a href="/addcrop?agent_email=rajeshwar.kb@agri.com" class="agent-card" data-search="rajeshwar goud komaram bheem asifabad">
+                <div class="agent-top">
+                    <div class="agent-avatar">R</div>
+                    <div class="agent-info">
+                        <div class="agent-name">Rajeshwar Goud</div>
+                        <div class="agent-district"><i class="fas fa-map-marker-alt"></i> Komaram Bheem Asifabad</div>
+                    </div>
+                </div>
+                <div class="agent-details">
+                    <div class="agent-detail"><i class="fas fa-phone"></i> 9876543212</div>
+                    <div class="agent-detail"><i class="fas fa-envelope"></i> rajeshwar@agri.com</div>
+                </div>
+                <div class="agent-cta">List Your Crop <i class="fas fa-arrow-right"></i></div>
+            </a>
+
+            <a href="/addcrop?agent_email=anjali.mahabubabad@agri.com" class="agent-card" data-search="anjali sharma mahabubabad">
+                <div class="agent-top">
+                    <div class="agent-avatar" style="background: linear-gradient(135deg, var(--accent-harvest), #d97706);">A</div>
+                    <div class="agent-info">
+                        <div class="agent-name">Anjali Sharma</div>
+                        <div class="agent-district"><i class="fas fa-map-marker-alt"></i> Mahabubabad</div>
+                    </div>
+                </div>
+                <div class="agent-details">
+                    <div class="agent-detail"><i class="fas fa-phone"></i> 9876543213</div>
+                    <div class="agent-detail"><i class="fas fa-envelope"></i> anjali@agri.com</div>
+                </div>
+                <div class="agent-cta">List Your Crop <i class="fas fa-arrow-right"></i></div>
+            </a>
+
+            <a href="/addcrop?agent_email=srinivas.mbnr@agri.com" class="agent-card" data-search="srinivas rao mahabubnagar">
+                <div class="agent-top">
+                    <div class="agent-avatar">S</div>
+                    <div class="agent-info">
+                        <div class="agent-name">Srinivas Rao</div>
+                        <div class="agent-district"><i class="fas fa-map-marker-alt"></i> Mahabubnagar</div>
+                    </div>
+                </div>
+                <div class="agent-details">
+                    <div class="agent-detail"><i class="fas fa-phone"></i> 9876543214</div>
+                    <div class="agent-detail"><i class="fas fa-envelope"></i> srinivas@agri.com</div>
+                </div>
+                <div class="agent-cta">List Your Crop <i class="fas fa-arrow-right"></i></div>
+            </a>
+
+            <a href="/addcrop?agent_email=farida.mancherial@agri.com" class="agent-card" data-search="farida begum mancherial">
+                <div class="agent-top">
+                    <div class="agent-avatar" style="background: linear-gradient(135deg, var(--accent-success), #059669);">F</div>
+                    <div class="agent-info">
+                        <div class="agent-name">Farida Begum</div>
+                        <div class="agent-district"><i class="fas fa-map-marker-alt"></i> Mancherial</div>
+                    </div>
+                </div>
+                <div class="agent-details">
+                    <div class="agent-detail"><i class="fas fa-phone"></i> 9876543215</div>
+                    <div class="agent-detail"><i class="fas fa-envelope"></i> farida@agri.com</div>
+                </div>
+                <div class="agent-cta">List Your Crop <i class="fas fa-arrow-right"></i></div>
+            </a>
+
+            <a href="/addcrop?agent_email=ganesh.medak@agri.com" class="agent-card" data-search="ganesh reddy medak">
+                <div class="agent-top">
+                    <div class="agent-avatar">G</div>
+                    <div class="agent-info">
+                        <div class="agent-name">Ganesh Reddy</div>
+                        <div class="agent-district"><i class="fas fa-map-marker-alt"></i> Medak</div>
+                    </div>
+                </div>
+                <div class="agent-details">
+                    <div class="agent-detail"><i class="fas fa-phone"></i> 9876543216</div>
+                    <div class="agent-detail"><i class="fas fa-envelope"></i> ganesh@agri.com</div>
+                </div>
+                <div class="agent-cta">List Your Crop <i class="fas fa-arrow-right"></i></div>
+            </a>
+
+            <a href="/addcrop?agent_email=chandana.medchal@agri.com" class="agent-card" data-search="chandana das medchal malkajgiri">
+                <div class="agent-top">
+                    <div class="agent-avatar" style="background: linear-gradient(135deg, var(--accent-harvest), #d97706);">C</div>
+                    <div class="agent-info">
+                        <div class="agent-name">Chandana Das</div>
+                        <div class="agent-district"><i class="fas fa-map-marker-alt"></i> Medchal-Malkajgiri</div>
+                    </div>
+                </div>
+                <div class="agent-details">
+                    <div class="agent-detail"><i class="fas fa-phone"></i> 9876543217</div>
+                    <div class="agent-detail"><i class="fas fa-envelope"></i> chandana@agri.com</div>
+                </div>
+                <div class="agent-cta">List Your Crop <i class="fas fa-arrow-right"></i></div>
+            </a>
+
+            <a href="/addcrop?agent_email=vijay.mulugu@agri.com" class="agent-card" data-search="vijay singh mulugu">
+                <div class="agent-top">
+                    <div class="agent-avatar">V</div>
+                    <div class="agent-info">
+                        <div class="agent-name">Vijay Singh</div>
+                        <div class="agent-district"><i class="fas fa-map-marker-alt"></i> Mulugu</div>
+                    </div>
+                </div>
+                <div class="agent-details">
+                    <div class="agent-detail"><i class="fas fa-phone"></i> 9876543218</div>
+                    <div class="agent-detail"><i class="fas fa-envelope"></i> vijay@agri.com</div>
+                </div>
+                <div class="agent-cta">List Your Crop <i class="fas fa-arrow-right"></i></div>
+            </a>
+
+            <a href="/addcrop?agent_email=laxman.nagarkurnool@agri.com" class="agent-card" data-search="laxman nagarkurnool">
+                <div class="agent-top">
+                    <div class="agent-avatar" style="background: linear-gradient(135deg, var(--accent-success), #059669);">L</div>
+                    <div class="agent-info">
+                        <div class="agent-name">Laxman B</div>
+                        <div class="agent-district"><i class="fas fa-map-marker-alt"></i> Nagarkurnool</div>
+                    </div>
+                </div>
+                <div class="agent-details">
+                    <div class="agent-detail"><i class="fas fa-phone"></i> 9876543219</div>
+                    <div class="agent-detail"><i class="fas fa-envelope"></i> laxman@agri.com</div>
+                </div>
+                <div class="agent-cta">List Your Crop <i class="fas fa-arrow-right"></i></div>
+            </a>
+
+            <a href="/addcrop?agent_email=padma.nalgonda@agri.com" class="agent-card" data-search="padma nalgonda">
+                <div class="agent-top">
+                    <div class="agent-avatar">P</div>
+                    <div class="agent-info">
+                        <div class="agent-name">Padma S</div>
+                        <div class="agent-district"><i class="fas fa-map-marker-alt"></i> Nalgonda</div>
+                    </div>
+                </div>
+                <div class="agent-details">
+                    <div class="agent-detail"><i class="fas fa-phone"></i> 9876543220</div>
+                    <div class="agent-detail"><i class="fas fa-envelope"></i> padma@agri.com</div>
+                </div>
+                <div class="agent-cta">List Your Crop <i class="fas fa-arrow-right"></i></div>
+            </a>
+
+            <a href="/addcrop?agent_email=naresh.narayanpet@agri.com" class="agent-card" data-search="naresh narayanpet">
+                <div class="agent-top">
+                    <div class="agent-avatar" style="background: linear-gradient(135deg, var(--accent-harvest), #d97706);">N</div>
+                    <div class="agent-info">
+                        <div class="agent-name">Naresh P</div>
+                        <div class="agent-district"><i class="fas fa-map-marker-alt"></i> Narayanpet</div>
+                    </div>
+                </div>
+                <div class="agent-details">
+                    <div class="agent-detail"><i class="fas fa-phone"></i> 9876543221</div>
+                    <div class="agent-detail"><i class="fas fa-envelope"></i> naresh@agri.com</div>
+                </div>
+                <div class="agent-cta">List Your Crop <i class="fas fa-arrow-right"></i></div>
+            </a>
+
+            <a href="/addcrop?agent_email=saiteja.nirmal@agri.com" class="agent-card" data-search="sai teja nirmal">
+                <div class="agent-top">
+                    <div class="agent-avatar">S</div>
+                    <div class="agent-info">
+                        <div class="agent-name">Sai Teja</div>
+                        <div class="agent-district"><i class="fas fa-map-marker-alt"></i> Nirmal</div>
+                    </div>
+                </div>
+                <div class="agent-details">
+                    <div class="agent-detail"><i class="fas fa-phone"></i> 9876543222</div>
+                    <div class="agent-detail"><i class="fas fa-envelope"></i> saiteja@agri.com</div>
+                </div>
+                <div class="agent-cta">List Your Crop <i class="fas fa-arrow-right"></i></div>
+            </a>
+
+            <a href="/addcrop?agent_email=lavanya.nizamabad@agri.com" class="agent-card" data-search="lavanya nizamabad">
+                <div class="agent-top">
+                    <div class="agent-avatar" style="background: linear-gradient(135deg, var(--accent-success), #059669);">L</div>
+                    <div class="agent-info">
+                        <div class="agent-name">Lavanya K</div>
+                        <div class="agent-district"><i class="fas fa-map-marker-alt"></i> Nizamabad</div>
+                    </div>
+                </div>
+                <div class="agent-details">
+                    <div class="agent-detail"><i class="fas fa-phone"></i> 9876543223</div>
+                    <div class="agent-detail"><i class="fas fa-envelope"></i> lavanya@agri.com</div>
+                </div>
+                <div class="agent-cta">List Your Crop <i class="fas fa-arrow-right"></i></div>
+            </a>
+
+            <a href="/addcrop?agent_email=meena.rangareddy@agri.com" class="agent-card" data-search="meena kumari rangareddy">
+                <div class="agent-top">
+                    <div class="agent-avatar">M</div>
+                    <div class="agent-info">
+                        <div class="agent-name">Meena Kumari</div>
+                        <div class="agent-district"><i class="fas fa-map-marker-alt"></i> Rangareddy</div>
+                    </div>
+                </div>
+                <div class="agent-details">
+                    <div class="agent-detail"><i class="fas fa-phone"></i> 9876543226</div>
+                    <div class="agent-detail"><i class="fas fa-envelope"></i> meena@agri.com</div>
+                </div>
+                <div class="agent-cta">List Your Crop <i class="fas fa-arrow-right"></i></div>
+            </a>
+
+            <a href="/addcrop?agent_email=kiran.sangareddy@agri.com" class="agent-card" data-search="kiran sangareddy">
+                <div class="agent-top">
+                    <div class="agent-avatar" style="background: linear-gradient(135deg, var(--accent-harvest), #d97706);">K</div>
+                    <div class="agent-info">
+                        <div class="agent-name">Kiran R</div>
+                        <div class="agent-district"><i class="fas fa-map-marker-alt"></i> Sangareddy</div>
+                    </div>
+                </div>
+                <div class="agent-details">
+                    <div class="agent-detail"><i class="fas fa-phone"></i> 9876543227</div>
+                    <div class="agent-detail"><i class="fas fa-envelope"></i> kiran@agri.com</div>
+                </div>
+                <div class="agent-cta">List Your Crop <i class="fas fa-arrow-right"></i></div>
+            </a>
+
+            <a href="/addcrop?agent_email=anand.warangal@agri.com" class="agent-card" data-search="anand rao warangal">
+                <div class="agent-top">
+                    <div class="agent-avatar">A</div>
+                    <div class="agent-info">
+                        <div class="agent-name">Anand Rao</div>
+                        <div class="agent-district"><i class="fas fa-map-marker-alt"></i> Warangal</div>
+                    </div>
+                </div>
+                <div class="agent-details">
+                    <div class="agent-detail"><i class="fas fa-phone"></i> 9876543232</div>
+                    <div class="agent-detail"><i class="fas fa-envelope"></i> anand@agri.com</div>
+                </div>
+                <div class="agent-cta">List Your Crop <i class="fas fa-arrow-right"></i></div>
+            </a>
+
+            <a href="/addcrop?agent_email=shalini.yadadri@agri.com" class="agent-card" data-search="shalini yadadri bhuvanagiri">
+                <div class="agent-top">
+                    <div class="agent-avatar" style="background: linear-gradient(135deg, var(--accent-success), #059669);">S</div>
+                    <div class="agent-info">
+                        <div class="agent-name">Shalini B</div>
+                        <div class="agent-district"><i class="fas fa-map-marker-alt"></i> Yadadri Bhuvanagiri</div>
+                    </div>
+                </div>
+                <div class="agent-details">
+                    <div class="agent-detail"><i class="fas fa-phone"></i> 9876543233</div>
+                    <div class="agent-detail"><i class="fas fa-envelope"></i> shalini@agri.com</div>
+                </div>
+                <div class="agent-cta">List Your Crop <i class="fas fa-arrow-right"></i></div>
+            </a>
+
+        </div>
+
+        <!-- No Results State -->
+        <div class="no-results" id="noResults">
+            <i class="fas fa-search"></i>
+            <p>No agents found for "<span id="searchTerm"></span>"</p>
+        </div>
+
+    </div>
 </div>
 
 <script>
-  const input = document.getElementById("searchInput");
-  const cards = document.querySelectorAll(".card");
+    const searchInput = document.getElementById('searchInput');
+    const cards = document.querySelectorAll('.agent-card');
+    const noResults = document.getElementById('noResults');
 
-  input.addEventListener("input", function () {
-    const filter = input.value.toLowerCase();
-    cards.forEach(card => {
-      const text = card.textContent.toLowerCase();
-      card.style.display = text.includes(filter) ? "block" : "none";
+    searchInput.addEventListener('input', function() {
+        const q = this.value.toLowerCase().trim();
+        let visible = 0;
+        cards.forEach(card => {
+            // Search in data-search attribute and visible text
+            const dataText = card.getAttribute('data-search') || '';
+            const visibleText = card.textContent;
+            const text = (dataText + ' ' + visibleText).toLowerCase();
+            
+            const show = !q || text.includes(q);
+            card.style.display = show ? 'flex' : 'none';
+            if (show) visible++;
+        });
+        noResults.style.display = visible === 0 ? 'block' : 'none';
+        document.getElementById('searchTerm').textContent = q;
     });
-  });
 </script>
 
 </body>

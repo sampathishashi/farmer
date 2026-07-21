@@ -2,35 +2,181 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Add Crop Details</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Crop — AgriMarket</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
-        body { font-family: Arial, sans-serif; background: #f4f8fb; margin: 0; }
-        .container { max-width: 420px; margin: 50px auto; background: #fff; border-radius: 12px; box-shadow: 0 2px 16px rgba(42,122,226,0.10); padding: 32px 24px; }
-        h2 { color: #2a7ae2; text-align: center; margin-bottom: 24px; }
-        form { display: flex; flex-direction: column; gap: 18px; }
-        input, select { padding: 12px; border-radius: 8px; border: 1px solid #d2e3f7; font-size: 1em; }
-        button { background: #2a7ae2; color: #fff; border: none; border-radius: 8px; padding: 14px; font-size: 1.1em; cursor: pointer; margin-top: 10px; }
-        button:hover { background: #155fa0; }
+        :root {
+            --soil: #3d2b1f;
+            --leaf: #2d6a4f;
+            --harvest: #e9c46a;
+            --stem: #52b788;
+            --white: #fafaf8;
+            --mist: #f0f4f0;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'DM Sans', sans-serif;
+            min-height: 100vh;
+            background: var(--mist);
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+        }
+
+        /* LEFT */
+        .left {
+            background: linear-gradient(160deg, #0a2416, #1a3d2b, #2d6a4f);
+            padding: 60px;
+            display: flex; flex-direction: column; justify-content: center;
+            position: sticky; top: 0; height: 100vh;
+        }
+        .back-link {
+            display: inline-flex; align-items: center; gap: 8px;
+            color: rgba(255,255,255,0.6); text-decoration: none;
+            font-size: 0.88rem; margin-bottom: 48px; transition: color 0.2s;
+        }
+        .back-link:hover { color: var(--harvest); }
+        .left-logo {
+            font-family: 'Playfair Display', serif; font-size: 1.6rem; font-weight: 900;
+            color: white; margin-bottom: 40px;
+        }
+        .left-logo span { color: var(--harvest); }
+        .left-headline {
+            font-family: 'Playfair Display', serif; font-size: 2.8rem; line-height: 1.15;
+            color: white; margin-bottom: 20px;
+        }
+        .left-headline em { color: var(--harvest); font-style: normal; }
+        .left-sub { color: rgba(255,255,255,0.65); font-size: 1rem; line-height: 1.7; margin-bottom: 48px; }
+        .left-tips { display: flex; flex-direction: column; gap: 16px; }
+        .tip {
+            display: flex; align-items: flex-start; gap: 14px;
+            color: rgba(255,255,255,0.7); font-size: 0.9rem; line-height: 1.5;
+        }
+        .tip-icon {
+            width: 34px; height: 34px; border-radius: 10px; flex-shrink: 0;
+            background: rgba(255,255,255,0.1);
+            display: flex; align-items: center; justify-content: center; font-size: 0.95rem;
+        }
+
+        /* RIGHT */
+        .right {
+            padding: 60px 48px; overflow-y: auto;
+            display: flex; flex-direction: column; justify-content: center;
+        }
+        .form-heading {
+            font-family: 'Playfair Display', serif; font-size: 2rem; font-weight: 900;
+            color: var(--soil); margin-bottom: 8px;
+        }
+        .form-sub { color: #888; margin-bottom: 36px; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .form-group { display: flex; flex-direction: column; gap: 7px; }
+        .form-group.full { grid-column: 1 / -1; }
+        .form-group label { font-size: 0.88rem; font-weight: 600; color: var(--soil); }
+        .form-group input, .form-group select {
+            padding: 13px 16px; border: 2px solid #e4ede4; border-radius: 12px;
+            font-family: 'DM Sans', sans-serif; font-size: 0.97rem;
+            transition: border 0.2s, box-shadow 0.2s; outline: none;
+            background: var(--white); color: var(--soil);
+        }
+        .form-group input:focus, .form-group select:focus {
+            border-color: var(--leaf);
+            box-shadow: 0 0 0 4px rgba(45,106,79,0.08);
+        }
+        .form-group input::placeholder { color: #b0bfb0; }
+        .selected-agent {
+            background: rgba(45,106,79,0.06); border: 2px solid rgba(45,106,79,0.2);
+            border-radius: 12px; padding: 14px 18px;
+            display: flex; align-items: center; gap: 12px;
+            margin-bottom: 24px;
+        }
+        .sa-icon { font-size: 1.4rem; }
+        .sa-text { font-size: 0.92rem; }
+        .sa-text strong { color: var(--leaf); }
+        .btn-submit {
+            width: 100%; padding: 16px;
+            background: var(--leaf); color: var(--white);
+            border: none; border-radius: 12px;
+            font-family: 'DM Sans', sans-serif; font-size: 1.05rem;
+            font-weight: 700; cursor: pointer; margin-top: 8px;
+            transition: all 0.25s;
+        }
+        .btn-submit:hover { background: var(--soil); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(45,106,79,0.25); }
+
+        @media (max-width: 768px) {
+            body { grid-template-columns: 1fr; }
+            .left { display: none; }
+            .right { padding: 32px 20px; }
+            .form-grid { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h2>Add Crop Details</h2>
-        <form method="POST">
-            <input name="cropname" placeholder="Crop Name" required>
-            <input name="quantity" placeholder="Quantity" required>
-            <input name="price" placeholder="Price" required>
-            <input name="place" placeholder="Your Place" required>
-            <input name="phone" placeholder="Your Phone" required>
-            <input name="seller_email" placeholder="Your Email" required>
-            <select name="agent_email" required>
-                <option value="">Select Agent</option>
-                {% for agent in agents %}
-                <option value="{{ agent.email }}">{{ agent.name }} ({{ agent.district }})</option>
-                {% endfor %}
-            </select>
-            <button type="submit">Add Crop</button>
-        </form>
+
+<!-- LEFT -->
+<div class="left">
+    <a href="/agent" class="back-link">← Back to Agents</a>
+    <div class="left-logo">Agri<span>Market</span></div>
+    <h1 class="left-headline">List Your<br>Crop &<br><em>Get Found.</em></h1>
+    <p class="left-sub">Your listing reaches hundreds of buyers across Telangana. Fill in the details and let the market come to you.</p>
+    <div class="left-tips">
+        <div class="tip"><div class="tip-icon">💰</div>Set a fair price based on current market rates</div>
+        <div class="tip"><div class="tip-icon">📍</div>Accurate location helps buyers plan logistics</div>
+        <div class="tip"><div class="tip-icon">🤝</div>Your assigned agent will verify and list your crop</div>
+        <div class="tip"><div class="tip-icon">🔔</div>You'll be notified when a buyer shows interest</div>
     </div>
+</div>
+
+<!-- RIGHT -->
+<div class="right">
+    <h1 class="form-heading">Add Crop Details</h1>
+    <p class="form-sub">Fill in all fields to submit your crop listing</p>
+
+    {% if agent_name %}
+    <div class="selected-agent">
+        <div class="sa-icon">👨‍🔬</div>
+        <div class="sa-text">Listing via agent: <strong>{{ agent_name }}</strong> ({{ agent_district }})</div>
+    </div>
+    {% endif %}
+
+    <form method="POST">
+        <div class="form-grid">
+            <div class="form-group full">
+                <label>Crop Name</label>
+                <input name="cropname" placeholder="e.g. Wheat, Cotton, Tomatoes" required>
+            </div>
+            <div class="form-group">
+                <label>Quantity (kg)</label>
+                <input name="quantity" placeholder="e.g. 500" required type="number" min="1">
+            </div>
+            <div class="form-group">
+                <label>Price per kg (₹)</label>
+                <input name="price" placeholder="e.g. 45" required type="number" min="1">
+            </div>
+            <div class="form-group full">
+                <label>Your Location / Village</label>
+                <input name="place" placeholder="Village, Mandal, District" required>
+            </div>
+            <div class="form-group">
+                <label>Phone Number</label>
+                <input name="phone" placeholder="10-digit mobile" required>
+            </div>
+            <div class="form-group">
+                <label>Your Email</label>
+                <input name="seller_email" placeholder="name@example.com" type="email" required>
+            </div>
+            <div class="form-group full">
+                <label>Assign to Agent</label>
+                <select name="agent_email" required>
+                    <option value="">Select your district agent</option>
+                    {% for agent in agents %}
+                    <option value="{{ agent.email }}" {% if request.args.get('agent_email') == agent.email %}selected{% endif %}>{{ agent.name }} — {{ agent.district }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <button type="submit" class="btn-submit" style="margin-top:24px;">🌾 Submit Crop Listing →</button>
+    </form>
+</div>
+
 </body>
-</html> 
+</html>

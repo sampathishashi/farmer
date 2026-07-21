@@ -3,711 +3,556 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AgriMarket: FarmerSync & MarketConnect</title>
+    <title>AgriMarket — FarmerSync & MarketConnect</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --soil: #3d2b1f;
+            --leaf: #2d6a4f;
+            --harvest: #e9c46a;
+            --sky: #023e8a;
+            --mist: #f0f4f0;
+            --stem: #52b788;
+            --clay: #c77dff;
+            --sun: #f4a261;
+            --white: #fafaf8;
+            --dark: #1a1a2e;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
         body {
-            font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
-            background: linear-gradient(135deg, #f8fafc 0%, #e0e7ff 100%);
-            margin: 0;
-            padding: 0;
-            line-height: 1.7;
+            font-family: 'DM Sans', sans-serif;
+            background: var(--white);
+            color: var(--dark);
+            overflow-x: hidden;
         }
-        .top-nav {
-            background: linear-gradient(90deg, #6366f1 0%, #10b981 100%);
-            padding: 16px 32px;
-            display: flex;
-            justify-content: flex-end;
-            gap: 16px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-            border-bottom-left-radius: 18px;
-            border-bottom-right-radius: 18px;
+
+        /* ─── NAV ─── */
+        nav {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 18px 5%;
+            background: rgba(250,250,248,0.92);
+            backdrop-filter: blur(14px);
+            border-bottom: 1px solid rgba(45,106,79,0.1);
         }
-        .top-nav a {
-            color: #fff;
-            text-decoration: none;
-            padding: 12px 24px;
-            background: #6366f1;
-            border-radius: 12px;
-            font-weight: 600;
-            font-size: 1.05em;
-            letter-spacing: 0.5px;
-            transition: background 0.3s, transform 0.2s, box-shadow 0.2s;
-            box-shadow: 0 2px 6px rgba(99, 102, 241, 0.08);
+        .nav-logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem; font-weight: 900;
+            color: var(--leaf);
+            letter-spacing: -0.5px;
         }
-        .top-nav a:hover {
-            background: #10b981;
-            transform: translateY(-3px) scale(1.05);
-            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15);
+        .nav-logo span { color: var(--harvest); }
+        .nav-links { display: flex; gap: 12px; align-items: center; }
+        .nav-links a {
+            text-decoration: none; font-weight: 500;
+            font-size: 0.95rem; color: var(--soil);
+            padding: 9px 20px; border-radius: 50px;
+            transition: all 0.25s;
         }
-        .top-nav a:last-child {
-            background: #f59e42;
+        .nav-links a:hover { color: var(--leaf); }
+        .nav-links .btn-login {
+            border: 2px solid var(--leaf); color: var(--leaf);
         }
-        .top-nav a:last-child:hover {
-            background: #fbbf24;
+        .nav-links .btn-signup {
+            background: var(--leaf); color: var(--white);
         }
-        header {
-            text-align: center;
-            padding: 56px 20px 32px;
-            background: linear-gradient(120deg, #6366f1 0%, #10b981 100%);
-            color: #fff;
-            border-bottom-left-radius: 32px;
-            border-bottom-right-radius: 32px;
-            box-shadow: 0 6px 24px rgba(99, 102, 241, 0.10);
+        .nav-links .btn-signup:hover { background: var(--soil); color: var(--harvest); }
+        .lang-sel {
+            border: 1px solid #d4e8d4; background: transparent;
+            border-radius: 8px; padding: 6px 10px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.88rem; cursor: pointer; color: var(--soil);
         }
-        header h1 {
-            font-size: 2.6em;
-            margin-bottom: 14px;
-            letter-spacing: 1px;
+
+        /* ─── HERO ─── */
+        .hero {
+            min-height: 100vh;
+            background: linear-gradient(160deg, #0a2416 0%, #1a3d2b 40%, #2d6a4f 75%, #52b788 100%);
+            display: flex; align-items: center;
+            padding: 120px 5% 80px;
+            position: relative; overflow: hidden;
         }
-        header p {
-            font-size: 1.18em;
-            max-width: 650px;
-            margin: 0 auto;
-            opacity: 0.95;
+        .hero::before {
+            content: '';
+            position: absolute; inset: 0;
+            background: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%2352b788' fill-opacity='0.06'%3E%3Cpath d='M40 40c0-11 9-20 20-20s20 9 20 20-9 20-20 20-20-9-20-20zm-40 0c0-11 9-20 20-20s20 9 20 20-9 20-20 20-20-9-20-20z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") repeat;
         }
-        main {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 32px;
-            padding: 40px 20px 0 20px;
+        .hero-text { position: relative; z-index: 2; max-width: 650px; }
+        .hero-eyebrow {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: rgba(233,196,106,0.15); border: 1px solid rgba(233,196,106,0.4);
+            color: var(--harvest); padding: 7px 18px; border-radius: 50px;
+            font-size: 0.85rem; font-weight: 600; letter-spacing: 1px; text-transform: uppercase;
+            margin-bottom: 28px;
         }
-        .feature-card {
-            background: linear-gradient(135deg, #fff 60%, #e0e7ff 100%);
-            border: none;
-            border-radius: 18px;
-            padding: 28px 20px 24px 20px;
-            width: 300px;
-            text-align: center;
-            box-shadow: 0 6px 24px rgba(99, 102, 241, 0.10);
-            transition: transform 0.3s, box-shadow 0.3s;
-            position: relative;
-        }
-        .feature-card:hover {
-            transform: translateY(-8px) scale(1.03);
-            box-shadow: 0 12px 32px rgba(16, 185, 129, 0.13);
-        }
-        .feature-card img {
-            width: 110px;
-            height: 80px;
-            object-fit: cover;
-            border-radius: 10px;
-            margin-bottom: 16px;
-            box-shadow: 0 2px 8px rgba(99, 102, 241, 0.08);
-        }
-        .feature-card h3 {
-            font-size: 1.25em;
-            color: #2563eb;
-            margin-bottom: 10px;
-        }
-        .feature-card p {
-            font-size: 1em;
-            color: #444;
-        }
-        .modal {
-            position: fixed;
-            inset: 0;
-            background: rgba(99, 102, 241, 0.18);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-        .modal.active {
-            display: flex;
-            opacity: 1;
-        }
-        .modal-content {
-            background: #fff;
-            padding: 32px 24px;
-            border-radius: 16px;
-            width: 95%;
-            max-width: 420px;
-            box-shadow: 0 8px 32px rgba(99, 102, 241, 0.13);
-            transform: scale(0.85);
-            transition: transform 0.3s;
-        }
-        .modal.active .modal-content {
-            transform: scale(1);
-        }
-        .modal-content h3 {
-            margin-bottom: 22px;
-            font-size: 1.35em;
-            color: #2563eb;
-        }
-        .modal-content form {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-        .modal-content input, .modal-content select {
-            padding: 12px;
-            border: 1px solid #c7d2fe;
-            border-radius: 8px;
-            font-size: 1em;
-        }
-        .modal-content button {
-            padding: 14px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 1em;
-            transition: background 0.3s;
-        }
-        .modal-content button[type="submit"] {
-            background: #6366f1;
-            color: #fff;
-        }
-        .modal-content button[type="submit"]:hover {
-            background: #10b981;
-        }
-        .modal-content button[type="button"] {
-            background: #f59e42;
-            color: #fff;
-        }
-        .modal-content button[type="button"]:hover {
-            background: #fbbf24;
-        }
-        .other-roles-section, .portfolio-section {
-            background: linear-gradient(135deg, #fff 60%, #e0e7ff 100%);
-            margin: 48px auto;
-            padding: 36px;
-            max-width: 1000px;
-            border-radius: 18px;
-            box-shadow: 0 6px 24px rgba(99, 102, 241, 0.10);
-        }
-        .other-roles-title, .portfolio-title {
-            font-size: 1.5em;
-            color: #2563eb;
+        .hero h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2.8rem, 6vw, 5rem);
+            line-height: 1.1; color: var(--white);
             margin-bottom: 24px;
-            text-align: center;
         }
-        .other-roles-cards, .portfolio-cards {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 28px;
-            justify-content: center;
+        .hero h1 em { color: var(--harvest); font-style: normal; }
+        .hero p {
+            font-size: 1.2rem; line-height: 1.7;
+            color: rgba(255,255,255,0.78); max-width: 540px;
+            margin-bottom: 40px;
         }
-        .portfolio-card {
-            background: #fff;
-            border-radius: 14px;
-            box-shadow: 0 2px 8px rgba(99, 102, 241, 0.08);
-            padding: 18px 14px;
-            width: 220px;
-            text-align: center;
-            transition: transform 0.2s, box-shadow 0.2s;
+        .hero-ctas { display: flex; gap: 16px; flex-wrap: wrap; }
+        .cta-primary {
+            background: var(--harvest); color: var(--soil);
+            padding: 16px 36px; border-radius: 50px;
+            font-weight: 700; font-size: 1rem;
+            text-decoration: none; transition: all 0.3s;
+            box-shadow: 0 6px 24px rgba(233,196,106,0.35);
         }
-        .portfolio-card:hover {
-            transform: translateY(-4px) scale(1.04);
-            box-shadow: 0 6px 18px rgba(16, 185, 129, 0.13);
+        .cta-primary:hover { background: #f4c842; transform: translateY(-3px); }
+        .cta-secondary {
+            background: rgba(255,255,255,0.1);
+            border: 2px solid rgba(255,255,255,0.35); color: var(--white);
+            padding: 16px 36px; border-radius: 50px;
+            font-weight: 600; font-size: 1rem;
+            text-decoration: none; transition: all 0.3s;
         }
-        .market-trends-section {
-            background: #fff;
-            margin: 40px auto;
-            padding: 30px;
-            max-width: 960px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        .cta-secondary:hover { background: rgba(255,255,255,0.18); }
+        .hero-scroll {
+            position: absolute; bottom: 40px; left: 50%;
+            transform: translateX(-50%);
+            color: rgba(255,255,255,0.5); font-size: 0.8rem;
+            display: flex; flex-direction: column; align-items: center; gap: 8px;
+            animation: bounce 2s infinite;
         }
-        .market-trends-title {
-            font-size: 1.5em;
-            color: #047857;
-            margin-bottom: 20px;
-            text-align: center;
+        @keyframes bounce { 0%,100%{transform:translateX(-50%) translateY(0)} 50%{transform:translateX(-50%) translateY(8px)} }
+        .scroll-line { width: 1px; height: 40px; background: rgba(255,255,255,0.3); }
+
+        /* ─── STATS STRIP ─── */
+        .stats-strip {
+            background: var(--soil); color: var(--white);
+            display: flex; justify-content: center; flex-wrap: wrap;
+            gap: 0;
         }
-        .market-trends-cards {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 16px;
-            justify-content: center;
+        .stat-item {
+            padding: 32px 48px; text-align: center;
+            border-right: 1px solid rgba(255,255,255,0.1);
+            flex: 1; min-width: 180px;
         }
-        .market-trends-card {
-            background: #f5f5f5;
-            border-radius: 8px;
-            padding: 16px;
-            width: 200px;
-            text-align: center;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        .stat-item:last-child { border-right: none; }
+        .stat-num {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.6rem; font-weight: 900; color: var(--harvest);
         }
-        .market-trends-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        .stat-lbl { font-size: 0.9rem; opacity: 0.7; margin-top: 4px; }
+
+        /* ─── FEATURES ─── */
+        .section { padding: 90px 5%; }
+        .section-label {
+            text-align: center; margin-bottom: 16px;
+            font-size: 0.82rem; font-weight: 700; letter-spacing: 2px;
+            text-transform: uppercase; color: var(--stem);
         }
-        .market-trends-img {
-            width: 100%;
-            height: 120px;
-            object-fit: cover;
-            border-radius: 6px;
-            margin-bottom: 10px;
+        .section-title {
+            text-align: center; margin-bottom: 64px;
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2rem, 4vw, 3rem); color: var(--soil);
+            line-height: 1.2;
         }
-        .testimonial-section {
-            background: #fff;
-            margin: 40px auto;
-            padding: 30px;
-            max-width: 960px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 28px; max-width: 1200px; margin: 0 auto;
         }
-        .testimonial-title {
-            font-size: 1.5em;
-            color: #047857;
-            margin-bottom: 20px;
-            text-align: center;
+        .feat-card {
+            background: var(--white);
+            border: 1px solid rgba(45,106,79,0.12);
+            border-radius: 20px; padding: 36px 28px;
+            transition: all 0.3s; cursor: default;
+            position: relative; overflow: hidden;
         }
-        .testimonial-cards {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 16px;
-            justify-content: center;
+        .feat-card::before {
+            content: ''; position: absolute; inset: 0;
+            background: linear-gradient(135deg, rgba(82,183,136,0.04), transparent);
+            opacity: 0; transition: opacity 0.3s;
         }
-        .testimonial-card {
-            background: #f5f5f5;
-            border-radius: 8px;
-            padding: 16px;
-            width: 200px;
-            text-align: center;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        .feat-card:hover { transform: translateY(-6px); box-shadow: 0 20px 48px rgba(45,106,79,0.12); border-color: rgba(45,106,79,0.25); }
+        .feat-card:hover::before { opacity: 1; }
+        .feat-icon {
+            width: 56px; height: 56px; border-radius: 16px;
+            background: linear-gradient(135deg, var(--leaf), var(--stem));
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.6rem; margin-bottom: 20px;
         }
-        .testimonial-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        .feat-card h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.25rem; color: var(--soil); margin-bottom: 12px;
         }
-        .testimonial-img {
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            object-fit: cover;
-            margin-bottom: 10px;
+        .feat-card p { font-size: 0.95rem; line-height: 1.65; color: #666; }
+
+        /* ─── ROLES ─── */
+        .roles-section { background: var(--mist); }
+        .roles-grid {
+            display: grid; grid-template-columns: repeat(3, 1fr);
+            gap: 24px; max-width: 1100px; margin: 0 auto;
         }
+        .role-card {
+            background: var(--white); border-radius: 24px;
+            padding: 40px 32px; text-align: center;
+            border: 2px solid transparent; transition: all 0.35s;
+            cursor: pointer; text-decoration: none; color: inherit;
+            display: block;
+        }
+        .role-card:hover { border-color: var(--leaf); transform: scale(1.03); box-shadow: 0 16px 40px rgba(45,106,79,0.14); }
+        .role-emoji { font-size: 3rem; margin-bottom: 18px; display: block; }
+        .role-card h3 {
+            font-family: 'Playfair Display', serif; font-size: 1.4rem;
+            color: var(--soil); margin-bottom: 12px;
+        }
+        .role-card p { font-size: 0.93rem; color: #777; line-height: 1.6; }
+        .role-badge {
+            display: inline-block; margin-top: 20px;
+            background: var(--leaf); color: var(--white);
+            padding: 8px 22px; border-radius: 50px; font-size: 0.88rem; font-weight: 600;
+        }
+
+        /* ─── MARKET TRENDS ─── */
+        .trends-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px; max-width: 1100px; margin: 0 auto;
+        }
+        .trend-card {
+            background: var(--white); border-radius: 18px;
+            padding: 28px 24px; border-left: 4px solid var(--stem);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.05); transition: all 0.25s;
+        }
+        .trend-card:hover { box-shadow: 0 10px 30px rgba(0,0,0,0.1); transform: translateY(-3px); }
+        .trend-crop { font-weight: 700; color: var(--soil); font-size: 1.05rem; margin-bottom: 8px; }
+        .trend-pct {
+            font-family: 'Playfair Display', serif; font-size: 2rem;
+            font-weight: 900; margin-bottom: 10px;
+        }
+        .up { color: #2d9548; }
+        .down { color: #c0392b; }
+        .trend-desc { font-size: 0.88rem; color: #777; line-height: 1.55; }
+
+        /* ─── TESTIMONIALS ─── */
+        .testimonials-section { background: var(--dark); color: var(--white); }
+        .testimonials-section .section-title { color: var(--white); }
+        .testimonials-section .section-label { color: var(--harvest); }
+        .testimonials-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 24px; max-width: 1100px; margin: 0 auto;
+        }
+        .testi-card {
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px; padding: 32px;
+        }
+        .testi-quote { font-size: 2.5rem; color: var(--harvest); margin-bottom: 12px; line-height: 1; }
+        .testi-text { font-size: 0.97rem; line-height: 1.7; opacity: 0.85; margin-bottom: 22px; }
+        .testi-name { font-weight: 700; color: var(--harvest); }
+        .testi-role { font-size: 0.85rem; opacity: 0.55; margin-top: 4px; }
+
+        /* ─── FOOTER ─── */
         footer {
-            text-align: center;
-            padding: 20px;
-            background: #4A7043;
-            color: #fff;
-            font-size: 0.95em;
-            margin-top: 40px;
-            box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
+            background: var(--soil); color: rgba(255,255,255,0.6);
+            text-align: center; padding: 32px 5%;
+            font-size: 0.88rem;
         }
-        footer a {
-            color: #10b981;
-            text-decoration: none;
-            transition: color 0.3s ease;
+        footer a { color: var(--harvest); text-decoration: none; }
+
+        /* ─── MODAL ─── */
+        .modal-overlay {
+            position: fixed; inset: 0;
+            background: rgba(10,36,22,0.75);
+            display: none; align-items: center; justify-content: center;
+            z-index: 1000; backdrop-filter: blur(4px);
         }
-        footer a:hover {
-            color: #0a8f66;
+        .modal-overlay.open { display: flex; }
+        .modal-box {
+            background: var(--white); border-radius: 24px;
+            padding: 44px 36px; width: 95%; max-width: 440px;
+            position: relative; animation: slideUp 0.3s ease;
         }
-        @media (max-width: 900px) {
-            main, .other-roles-cards, .portfolio-cards {
-                flex-direction: column;
-                align-items: center;
-            }
-            .feature-card, .portfolio-card {
-                width: 90%;
-                max-width: 350px;
-            }
+        @keyframes slideUp { from{transform:translateY(24px);opacity:0} to{transform:translateY(0);opacity:1} }
+        .modal-box h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.6rem; color: var(--soil); margin-bottom: 28px;
         }
-        @media (max-width: 600px) {
-            header {
-                padding: 32px 10px 18px;
-            }
-            .top-nav {
-                flex-direction: column;
-                align-items: flex-end;
-                padding: 10px 8px;
-            }
-            main {
-                padding: 18px 4px 0 4px;
-                gap: 18px;
-            }
-            .feature-card {
-                padding: 18px 8px 16px 8px;
-            }
-            .other-roles-section, .portfolio-section {
-                padding: 18px 6px;
-            }
+        .modal-close {
+            position: absolute; top: 18px; right: 22px;
+            font-size: 1.4rem; cursor: pointer; color: #aaa;
+            background: none; border: none;
+        }
+        .form-group { margin-bottom: 18px; }
+        .form-group label { display: block; font-size: 0.9rem; font-weight: 600; color: var(--soil); margin-bottom: 7px; }
+        .form-group input, .form-group select {
+            width: 100%; padding: 13px 16px;
+            border: 2px solid #e2e8e2; border-radius: 12px;
+            font-family: 'DM Sans', sans-serif; font-size: 0.97rem;
+            transition: border 0.2s; outline: none;
+        }
+        .form-group input:focus, .form-group select:focus { border-color: var(--leaf); }
+        .modal-submit {
+            width: 100%; padding: 15px; background: var(--leaf);
+            color: var(--white); border: none; border-radius: 12px;
+            font-family: 'DM Sans', sans-serif; font-size: 1.05rem;
+            font-weight: 700; cursor: pointer; margin-top: 8px;
+            transition: all 0.25s;
+        }
+        .modal-submit:hover { background: var(--soil); }
+
+        @media (max-width: 768px) {
+            .roles-grid { grid-template-columns: 1fr; }
+            .hero { padding-top: 100px; }
+            nav { padding: 16px 4%; }
         }
     </style>
 </head>
 <body>
-    <nav class="top-nav">
-        <select id="languageSelect" style="margin-right:auto;padding:8px 12px;border-radius:8px;font-size:1em;">
-            <option value="en">English</option>
-            <option value="hi">हिन्दी</option>
+
+<!-- NAV -->
+<nav>
+    <div class="nav-logo">Agri<span>Market</span></div>
+    <div class="nav-links">
+        <select class="lang-sel" id="langSel">
+            <option value="en">🌐 English</option>
+            <option value="hi">हिंदी</option>
             <option value="te">తెలుగు</option>
         </select>
-        <a href="{{ url_for('signup') }}">Sign Up</a>
-        <a href="{{ url_for('login') }}">Login</a>
-    </nav>
-    <header>
-        <h1 data-i18n="title">🌱 AgriMarket: FarmerSync & MarketConnect</h1>
-        <p data-i18n="subtitle">Empower your farming journey with soil analysis, tailored crop advice, and seamless market access.</p>
-    </header>
-    <main>
-        <div class="feature-card">
-            <img src="https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=400&q=80" alt="Soil analysis">
+        <a href="/login" class="btn-login" data-i18n="login">Login</a>
+        <a href="/signup" class="btn-signup" data-i18n="signup">Sign Up</a>
+    </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+    <div class="hero-text">
+        <div class="hero-eyebrow">🌱 <span data-i18n="eyebrow">Telangana's Agricultural Platform</span></div>
+        <h1 data-i18n="hero_title">Grow Smarter.<br>Sell <em>Better.</em><br>Farm Stronger.</h1>
+        <p data-i18n="hero_sub">Soil analysis, crop recommendations, and direct market access — all in one platform built for Telangana's farming communities.</p>
+        <div class="hero-ctas">
+            <a href="/signup" class="cta-primary" data-i18n="get_started">Get Started Free</a>
+            <a href="#features" class="cta-secondary" data-i18n="learn_more">Explore Features</a>
+        </div>
+    </div>
+    <div class="hero-scroll">
+        <div class="scroll-line"></div>
+        <span>Scroll</span>
+    </div>
+</section>
+
+<!-- STATS -->
+<div class="stats-strip">
+    <div class="stat-item"><div class="stat-num">33</div><div class="stat-lbl">Districts Covered</div></div>
+    <div class="stat-item"><div class="stat-num">150+</div><div class="stat-lbl">Active Agents</div></div>
+    <div class="stat-item"><div class="stat-num">500+</div><div class="stat-lbl">Crops Listed</div></div>
+    <div class="stat-item"><div class="stat-num">95%</div><div class="stat-lbl">Farmer Satisfaction</div></div>
+</div>
+
+<!-- FEATURES -->
+<section class="section" id="features">
+    <div class="section-label">What We Offer</div>
+    <h2 class="section-title" data-i18n="features_title">Everything a Farmer Needs</h2>
+    <div class="features-grid">
+        <div class="feat-card">
+            <div class="feat-icon">🧪</div>
             <h3 data-i18n="soil_analysis">Soil Analysis</h3>
-            <p data-i18n="soil_analysis_desc">Upload or enter soil data to analyze nutrient levels, pH, and texture for precise farming insights.</p>
+            <p data-i18n="soil_analysis_desc">Upload or enter soil data for nutrients, pH, and texture. Get detailed reports from district agents.</p>
         </div>
-        <div class="feature-card">
-            <img src="https://images.unsplash.com/photo-1501004318641-b39e6451bec6?auto=format&fit=crop&w=400&q=80" alt="Crop recommendations">
+        <div class="feat-card">
+            <div class="feat-icon">🌾</div>
             <h3 data-i18n="crop_recommendations">Crop Recommendations</h3>
-            <p data-i18n="crop_recommendations_desc">Receive tailored crop suggestions and chemical usage guidance based on your soil's health.</p>
+            <p data-i18n="crop_recommendations_desc">AI-powered crop suggestions based on your soil health, seasonal data, and market demand.</p>
         </div>
-        <div class="feature-card">
-            <img src="https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&w=400&q=80" alt="Market access">
+        <div class="feat-card">
+            <div class="feat-icon">🏪</div>
             <h3 data-i18n="market_access">Market Access</h3>
-            <p data-i18n="market_access_desc">List your crops and connect with buyers for the best prices in local and regional markets.</p>
+            <p data-i18n="market_access_desc">List your crops and connect with verified buyers and companies across local and regional markets.</p>
         </div>
-        <div class="feature-card">
-            <img src="https://images.unsplash.com/photo-1508098682722-dde69717d038?auto=format&fit=crop&w=400&q=80" alt="Crop planning tool">
-            <h3 data-i18n="crop_planning">Crop Planning Tool</h3>
-            <p data-i18n="crop_planning_desc">Plan crop rotations and planting schedules based on soil data and market trends for optimal yield.</p>
+        <div class="feat-card">
+            <div class="feat-icon">📅</div>
+            <h3 data-i18n="crop_planning">Crop Planning Tools</h3>
+            <p data-i18n="crop_planning_desc">Plan crop rotation and planting schedules based on soil data and live market trend forecasts.</p>
         </div>
-    </main>
-    <section class="portfolio-section">
-        <h2 class="portfolio-title" data-i18n="success_stories">Our Farmer Success Stories</h2>
-        <div class="portfolio-cards">
-            <div class="portfolio-card">
-                <img src="https://images.unsplash.com/photo-1500595046743-cd271d6942a3?auto=format&fit=crop&w=200&q=80" alt="Organic Wheat Farm" class="portfolio-img">
-                <div>
-                    <h4 data-i18n="wheat_farm_title">Organic Wheat Farm</h4>
-                    <p data-i18n="wheat_farm_desc">Using soil analysis, this farm boosted wheat yield by 30% with organic fertilizers.</p>
-                </div>
-            </div>
-            <div class="portfolio-card">
-                <img src="https://images.unsplash.com/photo-1499529112087-3cb3b73cec95?auto=format&fit=crop&w=200&q=80" alt="Corn Plantation" class="portfolio-img">
-                <div>
-                    <h4 data-i18n="corn_plantation_title">Corn Plantation</h4>
-                    <p data-i18n="corn_plantation_desc">Followed crop suggestions to achieve record harvests and sold at premium markets.</p>
-                </div>
-            </div>
-            <div class="portfolio-card">
-                <img src="https://images.unsplash.com/photo-1592982538443-2e6b5d86b009?auto=format&fit=crop&w=200&q=80" alt="Vegetable Cooperative" class="portfolio-img">
-                <div>
-                    <h4 data-i18n="veg_coop_title">Vegetable Cooperative</h4>
-                    <p data-i18n="veg_coop_desc">Connected with buyers through AgriMarket, increasing profits by 25%.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-    <section class="other-roles-section">
-        <h2 class="other-roles-title" data-i18n="explore_roles">Explore Other Roles</h2>
-        <div class="other-roles-cards">
-            <div class="feature-card">
-                <img src="https://images.unsplash.com/photo-1586200937531-56e5fd8ae48b?auto=format&fit=crop&w=400&q=80" alt="Sellers">
-                <h3 data-i18n="sellers">Sellers</h3>
-                <p data-i18n="sellers_desc">Professionally curate and display your agricultural offerings, optimize inventory management, and engage seamlessly with prospective buyers through real-time notifications.</p>
-            </div>
-            <div class="feature-card">
-                <img src="https://images.unsplash.com/photo-1556741533-6e6a62bd8b49?auto=format&fit=crop&w=400&q=80" alt="Buyers">
-                <h3 data-i18n="buyers">Buyers</h3>
-                <p data-i18n="buyers_desc">Access a comprehensive catalog of high-quality crops, establish direct connections with trusted sellers, and negotiate competitive prices to secure optimal transactions.</p>
-            </div>
-            <div class="feature-card">
-                <img src="https://images.unsplash.com/photo-1521791136064-7986c2920216?auto=format&fit=crop&w=400&q=80" alt="Companies">
-                <h3 data-i18n="companies">Companies</h3>
-                <p data-i18n="companies_desc">Leverage in-depth market analytics to inform strategic decisions and foster enduring collaborations with farmers and sellers for sustainable growth.</p>
-            </div>
-        </div>
-    </section>
-    <section class="market-trends-section">
-        <h2 class="market-trends-title" data-i18n="market_trends">Market Trends</h2>
-        <div class="market-trends-cards">
-            <div class="market-trends-card">
-                <img src="https://images.unsplash.com/photo-1598033129183-8b8b4b3d5fc7?auto=format&fit=crop&w=200&q=80" alt="Wheat Trends" class="market-trends-img">
-                <div>
-                    <h4 data-i18n="wheat_trends">Wheat Trends</h4>
-                    <span data-i18n="wheat">Wheat</span>
-                    <p data-i18n="wheat_desc">Prices down 3% due to global surplus, but organic wheat demand rises 10%.</p>
-                </div>
-            </div>
-            <div class="market-trends-card">
-                <img src="https://images.unsplash.com/photo-1603190287607-3f3a8e37c2e2?auto=format&fit=crop&w=200&q=80" alt="Corn Trends" class="market-trends-img">
-                <div>
-                    <h4 data-i18n="corn_trends">Corn Trends</h4>
-                    <span data-i18n="corn">Corn</span>
-                    <p data-i18n="corn_desc">Stable prices with 7% export growth; drought in Brazil may tighten supply.</p>
-                </div>
-            </div>
-            <div class="market-trends-card">
-                <img src="https://images.unsplash.com/photo-1611080626919-7cf5a9b7c825?auto=format&fit=crop&w=200&q=80" alt="Soybean Trends" class="market-trends-img">
-                <div>
-                    <h4 data-i18n="soybean_trends">Soybean Trends</h4>
-                    <span data-i18n="soybeans">Soybeans</span>
-                    <p data-i18n="soybean_desc">Prices fell 5% due to record U.S. harvests; demand for oilseeds up 8%.</p>
-                </div>
-            </div>
-            <div class="market-trends-card">
-                <img src="https://images.unsplash.com/photo-1606851185651-b47bc3e0a41e?auto=format&fit=crop&w=200&q=80" alt="Vegetable Trends" class="market-trends-img">
-                <div>
-                    <h4 data-i18n="vegetable_trends">Vegetable Trends</h4>
-                    <span data-i18n="vegetables">Vegetables</span>
-                    <p data-i18n="vegetable_desc">Tomato prices up 9% due to monsoon disruptions; organic demand grows 25%.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-    <section class="testimonial-section">
-        <h2 class="testimonial-title" data-i18n="how_farmers_use">How Farmers Use AgriMarket</h2>
-        <div class="testimonial-cards">
-            <div class="testimonial-card">
-                <img src="https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=120&q=80" alt="Farmer Ramesh" class="testimonial-img">
-                <div>
-                    <h4 data-i18n="ramesh_name">Ramesh Kumar</h4>
-                    <p data-i18n="ramesh_testimonial">"AgriMarket's soil analysis boosted my yield, and I sold my crops at better prices!"</p>
-                </div>
-            </div>
-            <div class="testimonial-card">
-                <img src="https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=120&q=80" alt="Farmer Anita" class="testimonial-img">
-                <div>
-                    <h4 data-i18n="anita_name">Anita Devi</h4>
-                    <p data-i18n="anita_testimonial">"The crop suggestions and fertilizer tips saved me money and improved my harvest."</p>
-                </div>
-            </div>
-            <div class="testimonial-card">
-                <img src="https://images.unsplash.com/photo-1519864600265-abb23847ef2c?auto=format&fit=crop&w=120&q=80" alt="Farmer Joseph" class="testimonial-img">
-                <div>
-                    <h4 data-i18n="joseph_name">Joseph Mathew</h4>
-                    <p data-i18n="joseph_testimonial">"Finding buyers was never easier. AgriMarket connected me to the right markets."</p>
-                </div>
-            </div>
-            <div class="testimonial-card">
-                <img src="https://images.unsplash.com/photo-1506784983877-45594efa4cbe?auto=format&fit=crop&w=120&q=80" alt="Farmer Lakshmi" class="testimonial-img">
-                <div>
-                    <h4 data-i18n="lakshmi_name">Lakshmi Singh</h4>
-                    <p data-i18n="lakshmi_testimonial">"As a small farmer, AgriMarket's tools are simple and make farming decisions easy."</p>
-                </div>
-            </div>
-        </div>
-    </section>
+    </div>
+</section>
 
-    <!-- Login Modal -->
-    <!-- Signup Modal -->
-    <!-- The above modals and their forms have been removed as requested. -->
+<!-- ROLES -->
+<section class="section roles-section">
+    <div class="section-label">Platform Roles</div>
+    <h2 class="section-title" data-i18n="explore_roles">Who Is This For?</h2>
+    <div class="roles-grid">
+        <a href="/farmer" class="role-card">
+            <span class="role-emoji">👨‍🌾</span>
+            <h3>Farmers</h3>
+            <p>Access soil reports, crop advice, and sell your produce directly to verified buyers.</p>
+            <span class="role-badge">Enter Dashboard →</span>
+        </a>
+        <a href="/buyer" class="role-card">
+            <span class="role-emoji">🛒</span>
+            <h3 data-i18n="buyers">Buyers</h3>
+            <p data-i18n="buyers_desc">Browse hundreds of fresh crop listings. Connect directly with trusted sellers for the best deals.</p>
+            <span class="role-badge">View Crops →</span>
+        </a>
+        <a href="/agent" class="role-card">
+            <span class="role-emoji">🌱</span>
+            <h3>Agents</h3>
+            <p>Manage crop approvals, conduct soil analyses, and support farmers across your district.</p>
+            <span class="role-badge">Agent Portal →</span>
+        </a>
+    </div>
+</section>
 
-    
+<!-- MARKET TRENDS -->
+<section class="section" id="trends">
+    <div class="section-label">Live Insights</div>
+    <h2 class="section-title" data-i18n="market_trends">Market Trends</h2>
+    <div class="trends-grid">
+        <div class="trend-card">
+            <div class="trend-crop">🌾 Wheat</div>
+            <div class="trend-pct down">-3%</div>
+            <div class="trend-desc">Prices down due to global surplus, but organic wheat demand rises 10%.</div>
+        </div>
+        <div class="trend-card" style="border-color: var(--harvest);">
+            <div class="trend-crop">🌽 Corn</div>
+            <div class="trend-pct up">+7%</div>
+            <div class="trend-desc">Stable prices with 7% export growth; drought in Brazil may tighten supply.</div>
+        </div>
+        <div class="trend-card" style="border-color: #9b59b6;">
+            <div class="trend-crop">🫘 Soybeans</div>
+            <div class="trend-pct down">-5%</div>
+            <div class="trend-desc">Prices fell due to record U.S. harvests; demand for oilseeds up 8%.</div>
+        </div>
+        <div class="trend-card" style="border-color: var(--sun);">
+            <div class="trend-crop">🍅 Vegetables</div>
+            <div class="trend-pct up">+9%</div>
+            <div class="trend-desc">Tomato prices up due to monsoon disruptions; organic demand grows 25%.</div>
+        </div>
+    </div>
+</section>
 
-  
-    
+<!-- TESTIMONIALS -->
+<section class="section testimonials-section">
+    <div class="section-label">Success Stories</div>
+    <h2 class="section-title" data-i18n="success_stories">Farmers Who Grew With Us</h2>
+    <div class="testimonials-grid">
+        <div class="testi-card">
+            <div class="testi-quote">"</div>
+            <p class="testi-text" data-i18n="ramesh_testimonial">AgriMarket's soil analysis boosted my yield, and I sold my crops at better prices!</p>
+            <div class="testi-name" data-i18n="ramesh_name">Ramesh Kumar</div>
+            <div class="testi-role">Wheat Farmer, Adilabad</div>
+        </div>
+        <div class="testi-card">
+            <div class="testi-quote">"</div>
+            <p class="testi-text" data-i18n="anita_testimonial">The crop suggestions and fertilizer tips saved me money and improved my harvest.</p>
+            <div class="testi-name" data-i18n="anita_name">Anita Devi</div>
+            <div class="testi-role">Vegetable Farmer, Nizamabad</div>
+        </div>
+        <div class="testi-card">
+            <div class="testi-quote">"</div>
+            <p class="testi-text" data-i18n="joseph_testimonial">Finding buyers was never easier. AgriMarket connected me to the right markets.</p>
+            <div class="testi-name" data-i18n="joseph_name">Joseph Mathew</div>
+            <div class="testi-role">Rice Farmer, Khammam</div>
+        </div>
+        <div class="testi-card">
+            <div class="testi-quote">"</div>
+            <p class="testi-text" data-i18n="lakshmi_testimonial">As a small farmer, AgriMarket's tools are simple and make farming decisions easy.</p>
+            <div class="testi-name" data-i18n="lakshmi_name">Lakshmi Singh</div>
+            <div class="testi-role">Cotton Farmer, Warangal</div>
+        </div>
+    </div>
+</section>
 
-    
-    <footer>
-        <p><span data-i18n="footer_copyright">© 2025 AgriMarket: FarmerSync & MarketConnect.</span> <a href="mailto:support@agrimarket.com" data-i18n="contact_us">Contact Us</a></p>
-    </footer>
+<!-- FOOTER -->
+<footer>
+    <p style="font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--harvest);margin-bottom:12px;">AgriMarket</p>
+    <p>© 2025 AgriMarket: FarmerSync & MarketConnect. Built for Telangana's Farmers.</p>
+</footer>
 
-    <script>
-        function showModal(modalId) {
-            const modal = document.getElementById(modalId);
-            modal.style.display = 'flex';
-            setTimeout(() => modal.classList.add('active'), 10);
-        }
-        function closeModal(modalId) {
-            const modal = document.getElementById(modalId);
-            modal.classList.remove('active');
-            setTimeout(() => modal.style.display = 'none', 300);
-        }
-    </script>
-    <script>
-        const translations = {
-            en: {}, hi: {}, te: {}
-        };
-        Object.assign(translations.en, {
-            login: "Login",
-            signup: "Sign Up",
-            title: "🌱 AgriMarket: FarmerSync & MarketConnect",
-            subtitle: "Empower your farming journey with soil analysis, tailored crop advice, and seamless market access.",
-            soil_analysis: "Soil Analysis",
-            soil_analysis_desc: "Upload or enter soil data to analyze nutrient levels, pH, and texture for precise farming insights.",
-            crop_recommendations: "Crop Recommendations",
-            crop_recommendations_desc: "Receive tailored crop suggestions and chemical usage guidance based on your soil's health.",
-            market_access: "Market Access",
-            market_access_desc: "List your crops and connect with buyers for the best prices in local and regional markets.",
-            crop_planning: "Crop Planning Tool",
-            crop_planning_desc: "Plan crop rotations and planting schedules based on soil data and market trends for optimal yield.",
-            success_stories: "Our Farmer Success Stories",
-            explore_roles: "Explore Other Roles",
-            sellers: "Sellers",
-            sellers_desc: "Professionally curate and display your agricultural offerings, optimize inventory management, and engage seamlessly with prospective buyers through real-time notifications.",
-            buyers: "Buyers",
-            buyers_desc: "Access a comprehensive catalog of high-quality crops, establish direct connections with trusted sellers, and negotiate competitive prices to secure optimal transactions.",
-            companies: "Companies",
-            companies_desc: "Leverage in-depth market analytics to inform strategic decisions and foster enduring collaborations with farmers and sellers for sustainable growth.",
-            contact_us: "Contact Us",
-            market_trends: "Market Trends",
-            wheat_trends: "Wheat Trends",
-            wheat: "Wheat",
-            wheat_desc: "Prices down 3% due to global surplus, but organic wheat demand rises 10%.",
-            corn_trends: "Corn Trends",
-            corn: "Corn",
-            corn_desc: "Stable prices with 7% export growth; drought in Brazil may tighten supply.",
-            soybean_trends: "Soybean Trends",
-            soybeans: "Soybeans",
-            soybean_desc: "Prices fell 5% due to record U.S. harvests; demand for oilseeds up 8%.",
-            vegetable_trends: "Vegetable Trends",
-            vegetables: "Vegetables",
-            vegetable_desc: "Tomato prices up 9% due to monsoon disruptions; organic demand grows 25%.",
-            how_farmers_use: "How Farmers Use AgriMarket",
-            ramesh_name: "Ramesh Kumar",
-            ramesh_testimonial: "AgriMarket's soil analysis boosted my yield, and I sold my crops at better prices!",
-            anita_name: "Anita Devi",
-            anita_testimonial: "The crop suggestions and fertilizer tips saved me money and improved my harvest.",
-            joseph_name: "Joseph Mathew",
-            joseph_testimonial: "Finding buyers was never easier. AgriMarket connected me to the right markets.",
-            lakshmi_name: "Lakshmi Singh",
-            lakshmi_testimonial: "As a small farmer, AgriMarket's tools are simple and make farming decisions easy.",
-            wheat_farm_title: "Organic Wheat Farm",
-            wheat_farm_desc: "Using soil analysis, this farm boosted wheat yield by 30% with organic fertilizers.",
-            corn_plantation_title: "Corn Plantation",
-            corn_plantation_desc: "Followed crop suggestions to achieve record harvests and sold at premium markets.",
-            veg_coop_title: "Vegetable Cooperative",
-            veg_coop_desc: "Connected with buyers through AgriMarket, increasing profits by 25%."
-        });
-        Object.assign(translations.hi, {
-            login: "लॉगिन",
-            signup: "साइन अप",
-            title: "🌱 एग्रीमार्केट: किसान सिंक और मार्केट कनेक्ट",
-            subtitle: "मिट्टी विश्लेषण, फसल सलाह और बाज़ार तक आसान पहुँच के साथ अपनी खेती यात्रा को सशक्त बनाएं।",
-            soil_analysis: "मिट्टी विश्लेषण",
-            soil_analysis_desc: "पोषक तत्व, पीएच और बनावट के लिए मिट्टी डेटा अपलोड या दर्ज करें।",
-            crop_recommendations: "फसल सिफारिशें",
-            crop_recommendations_desc: "आपकी मिट्टी की सेहत के आधार पर फसल सुझाव और रासायनिक उपयोग मार्गदर्शन प्राप्त करें।",
-            market_access: "बाजार पहुँच",
-            market_access_desc: "अपनी फसलों को सूचीबद्ध करें और स्थानीय व क्षेत्रीय बाज़ारों में खरीदारों से जुड़ें।",
-            crop_planning: "फसल योजना उपकरण",
-            crop_planning_desc: "मिट्टी डेटा और बाज़ार रुझानों के आधार पर फसल चक्र और रोपण अनुसूची बनाएं।",
-            success_stories: "हमारी किसान सफलता कहानियाँ",
-            explore_roles: "अन्य भूमिकाएँ देखें",
-            sellers: "विक्रेता",
-            sellers_desc: "अपने कृषि उत्पादों को पेशेवर रूप से प्रदर्शित करें, इन्वेंट्री प्रबंधन को अनुकूलित करें, और खरीदारों के साथ रीयल-टाइम में जुड़ें।",
-            buyers: "खरीदार",
-            buyers_desc: "उच्च गुणवत्ता वाली फसलों की व्यापक सूची देखें, विक्रेताओं से सीधे जुड़ें और सर्वोत्तम सौदे करें।",
-            companies: "कंपनियाँ",
-            companies_desc: "गहन बाज़ार विश्लेषण का लाभ उठाएं और किसानों व विक्रेताओं के साथ स्थायी साझेदारी बनाएं।",
-            contact_us: "संपर्क करें",
-            market_trends: "बाजार रुझान",
-            wheat_trends: "गेहूं रुझान",
-            wheat: "गेहूं",
-            wheat_desc: "Prices down 3% due to global surplus, but organic wheat demand rises 10%.",
-            corn_trends: "मक्का रुझान",
-            corn: "मक्का",
-            corn_desc: "Stable prices with 7% export growth; drought in Brazil may tighten supply.",
-            soybean_trends: "सोयाबीन रुझान",
-            soybeans: "सोयाबीन",
-            soybean_desc: "Prices fell 5% due to record U.S. harvests; demand for oilseeds up 8%.",
-            vegetable_trends: "सब्ज़ी रुझान",
-            vegetables: "सब्ज़ियाँ",
-            vegetable_desc: "Tomato prices up 9% due to monsoon disruptions; organic demand grows 25%.",
-            how_farmers_use: "किसान एग्रीमार्केट का उपयोग कैसे करते हैं",
-            ramesh_name: "रमेश कुमार",
-            ramesh_testimonial: "एग्रीमार्केट के मिट्टी विश्लेषण से मेरी पैदावार बढ़ी और मैंने बेहतर दाम पाए!",
-            anita_name: "अनीता देवी",
-            anita_testimonial: "फसल सुझाव और उर्वरक टिप्स से पैसे बचे और फसल में सुधार हुआ।",
-            joseph_name: "जोसेफ मैथ्यू",
-            joseph_testimonial: "खरीदार ढूंढना आसान हो गया। एग्रीमार्केट ने सही बाज़ार से जोड़ा।",
-            lakshmi_name: "लक्ष्मी सिंग",
-            lakshmi_testimonial: "एक छोटे किसान के लिए एग्रीमार्केट के टूल्स सरल हैं और निर्णय आसान बनाते हैं।",
-            wheat_farm_title: "जैविक गेहूं फार्म",
-            wheat_farm_desc: "मिट्टी विश्लेषण से इस फार्म ने जैविक उर्वरकों के साथ गेहूं की पैदावार 30% बढ़ाई।",
-            corn_plantation_title: "मक्का बागान",
-            corn_plantation_desc: "फसल सुझावों का पालन कर रिकॉर्ड फसल प्राप्त की और प्रीమియం మార్కెట్లలో అమ్మారు.",
-            veg_coop_title: "सब्ज़ी सहकारी",
-            veg_coop_desc: "అగ్రిమార్కెట్ ద్వారా కొనుగోలుదారులతో కనెక్ట్ అయి, లాభాలు 25% పెరిగాయి."
-        });
-        Object.assign(translations.te, {
-            login: "లాగిన్",
-            signup: "సైన్ అప్",
-            title: "🌱 అగ్రిమార్కెట్: ఫార్మర్‌సింక్ & మార్కెట్‌కనెక్ట్",
-            subtitle: "మట్టిలో విశ్లేషణ, పంట సలహా, మరియు మార్కెట్ యాక్సెస్‌తో మీ వ్యవసాయ ప్రయాణాన్ని శక్తివంతం చేయండి.",
-            soil_analysis: "మట్టి విశ్లేషణ",
-            soil_analysis_desc: "పోషకాలు, పిహెచ్, మరియు టెక్స్చర్ కోసం మట్టి డేటాను అప్లోడ్ చేయండి లేదా నమోదు చేయండి.",
-            crop_recommendations: "పంట సిఫార్సులు",
-            crop_recommendations_desc: "మీ మట్టిలో ఆరోగ్యాన్ని బట్టి పంట సిఫార్సులు మరియు రసాయనాల మార్గదర్శకాన్ని పొందండి.",
-            market_access: "మార్కెట్ యాక్సెస్",
-            market_access_desc: "మీ పంటలను జాబితా చేయండి మరియు స్థానిక, ప్రాంతీయ మార్కెట్లలో కొనుగోలుదారులతో కనెక్ట్ అవ్వండి.",
-            crop_planning: "పంట ప్రణాళిక సాధనం",
-            crop_planning_desc: "మట్టి డేటా మరియు మార్కెట్ ట్రెండ్స్ ఆధారంగా పంటల మార్పిడి మరియు నాటే షెడ్యూల్ ప్లాన్ చేయండి.",
-            success_stories: "మన రైతుల విజయ కథలు",
-            explore_roles: "ఇతర పాత్రలను అన్వేషించండి",
-            sellers: "అమ్మకందారులు",
-            sellers_desc: "మీ వ్యవసాయ ఉత్పత్తులను ప్రొఫెషనల్‌గా ప్రదర్శించండి, నిల్వను మెరుగుపరచండి, మరియు కొనుగోలుదారులతో తక్షణమే కనెక్ట్ అవ్వండి.",
-            buyers: "కొనుగోలుదారులు",
-            buyers_desc: "అత్యుత్తమ పంటల జాబితాను చూడండి, నమ్మదగిన అమ్మకందారులతో నేరుగా కనెక్ట్ అవ్వండి, ఉత్తమ ధరలు పొందండి.",
-            companies: "కంపెనీలు",
-            companies_desc: "విస్తృతమైన మార్కెట్ విశ్లేషణను ఉపయోగించండి మరియు రైతులు, అమ్మకందారులతో దీర్ఘకాలిక భాగస్వామ్యాన్ని పెంపొందించండి.",
-            contact_us: "మమ్మల్ని సంప్రదించండి",
-            market_trends: "మార్కెట్ ట్రెండ్స్",
-            wheat_trends: "గోధుమ ట్రెండ్‌లు",
-            wheat: "గోధుమ",
-            wheat_desc: "ప్రపంచవ్యాప్తంగా అధిక సరఫరా వల్ల ధరలు 3% తగ్గాయి, కానీ ఆర్గానిక్ గోధుమకు డిమాండ్ 10% పెరిగింది.",
-            corn_trends: "మొక్కజొన్న ట్రెండ్‌లు",
-            corn: "మొక్కజొన్న",
-            corn_desc: "ధరలు స్థిరంగా ఉన్నాయి, 7% ఎగుమతి వృద్ధి; బ్రెజిల్‌లో ఎండ వల్ల సరఫరా తగ్గవచ్చు.",
-            soybean_trends: "సోయాబీన్ ట్రెండ్‌లు",
-            soybeans: "సోయాబీన్",
-            soybean_desc: "అమెరికాలో రికార్డు పంటల వల్ల ధరలు 5% తగ్గాయి; ఆయిల్‌సీడ్స్‌కు డిమాండ్ 8% పెరిగింది.",
-            vegetable_trends: "కూరగాయల ట్రెండ్‌లు",
-            vegetables: "కూరగాయలు",
-            vegetable_desc: "మాన్సూన్ ప్రభావంతో టమోటా ధరలు 9% పెరిగాయి; ఆర్గానిక్ డిమాండ్ 25% పెరిగింది.",
-            how_farmers_use: "రైతులు అగ్రిమార్కెట్‌ను ఎలా ఉపయోగిస్తున్నారు",
-            ramesh_name: "రమేష్ కుమార్",
-            ramesh_testimonial: "అగ్రిమార్కెట్ మట్టి విశ్లేషణతో నా దిగుబడి పెరిగింది, మంచి ధరలకు పంటలు అమ్మాను!",
-            anita_name: "అనితా దేవి",
-            anita_testimonial: "పంట సూచనలు, ఎరువు సూచనలతో డబ్బు ఆదా అయ్యింది, దిగుబడి మెరుగైంది.",
-            joseph_name: "జోసెఫ్ మాథ్యూ",
-            joseph_testimonial: "కొనుగోలుదారులను కనుగొనడం సులభం. అగ్రిమార్కెట్ సరైన మార్కెట్‌లకు కనెక్ట్ చేసింది.",
-            lakshmi_name: "లక్ష్మి సింగ్",
-            lakshmi_testimonial: "చిన్న రైతుని అయినా అగ్రిమార్కెట్ టూల్స్ సులభంగా ఉన్నాయి, నిర్ణయాలు తేలికగా తీసుకోగలను.",
-            wheat_farm_title: "ఆర్గానిక్ గోధుమ ఫారం",
-            wheat_farm_desc: "మట్టి విశ్లేషణతో ఈ ఫారం ఆర్గానిక్ ఎరువులతో గోధుమ దిగుబడిని 30% పెంచింది.",
-            corn_plantation_title: "మొక్కజొన్న తోట",
-            corn_plantation_desc: "పంట సూచనలను అనుసరించి రికార్డు దిగుబడిని సాధించి, ప్రీమియం మార్కెట్లలో అమ్మారు.",
-            veg_coop_title: "కూరగాయల సహకార సంఘం",
-            veg_coop_desc: "అగ్రిమార్కెట్ ద్వారా కొనుగోలుదారులతో కనెక్ట్ అయి, లాభాలు 25% పెరిగాయి."
-        });
-        Object.assign(translations.en, {
-            footer_copyright: "© 2025 AgriMarket: FarmerSync & MarketConnect.",
-            username_or_email: "Username or Email",
-            username: "Username",
-            email: "Email"
-        });
-        Object.assign(translations.hi, {
-            footer_copyright: "© 2025 एग्रीमार्केट: किसान सिंक और मार्केट कनेक्ट.",
-            username_or_email: "यूज़रनेम या ईमेल",
-            username: "यूज़रनेम",
-            email: "ईमेल"
-        });
-        Object.assign(translations.te, {
-            footer_copyright: "© 2025 అగ్రిమార్కెట్: ఫార్మర్‌సింక్ & మార్కెట్‌కనెక్ట్.",
-            username_or_email: "యూజర్‌నేమ్ లేదా ఇమెయిల్",
-            username: "యూజర్‌నేమ్",
-            email: "ఇమెయిల్"
-        });
-        function setLanguage(lang) {
-            document.querySelectorAll('[data-i18n]').forEach(el => {
-                const key = el.getAttribute('data-i18n');
-                if (translations[lang][key]) {
-                    el.textContent = translations[lang][key];
-                }
-            });
-            document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
-                const key = el.getAttribute('data-i18n-placeholder');
-                if (translations[lang][key]) {
-                    el.placeholder = translations[lang][key];
-                }
-            });
-        }
-        // On selector change, save to localStorage and update language
-        document.getElementById('languageSelect').addEventListener('change', function() {
-            localStorage.setItem('selectedLanguage', this.value);
-            setLanguage(this.value);
-        });
-        // On page load, use saved language or default to English
-        const savedLang = localStorage.getItem('selectedLanguage') || 'en';
-        document.getElementById('languageSelect').value = savedLang;
-        setLanguage(savedLang);
-    </script>
+<!-- LOGIN MODAL -->
+<div class="modal-overlay" id="loginModal">
+    <div class="modal-box">
+        <button class="modal-close" onclick="closeModal('loginModal')">✕</button>
+        <h3>Welcome Back</h3>
+        <form method="POST" action="/login">
+            <div class="form-group">
+                <label>Username</label>
+                <input name="username" placeholder="Enter your username" required>
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input name="password" type="password" placeholder="••••••••" required>
+            </div>
+            <button type="submit" class="modal-submit">Login →</button>
+        </form>
+    </div>
+</div>
+
+<script>
+const t = {
+    en: {
+        login:'Login', signup:'Sign Up', eyebrow:"Telangana's Agricultural Platform",
+        hero_title:'Grow Smarter. Sell Better. Farm Stronger.',
+        hero_sub:"Soil analysis, crop recommendations, and direct market access — all in one platform.",
+        get_started:'Get Started Free', learn_more:'Explore Features',
+        features_title:'Everything a Farmer Needs',
+        soil_analysis:'Soil Analysis', soil_analysis_desc:'Upload or enter soil data for nutrients, pH, and texture.',
+        crop_recommendations:'Crop Recommendations', crop_recommendations_desc:'AI-powered crop suggestions based on your soil health.',
+        market_access:'Market Access', market_access_desc:'List your crops and connect with verified buyers.',
+        crop_planning:'Crop Planning Tools', crop_planning_desc:'Plan crop rotation based on soil data and market trends.',
+        explore_roles:'Who Is This For?', buyers:'Buyers', buyers_desc:'Browse hundreds of fresh crop listings.',
+        market_trends:'Market Trends', success_stories:'Farmers Who Grew With Us',
+        ramesh_name:'Ramesh Kumar', ramesh_testimonial:"AgriMarket's soil analysis boosted my yield!",
+        anita_name:'Anita Devi', anita_testimonial:'The crop suggestions saved me money and improved my harvest.',
+        joseph_name:'Joseph Mathew', joseph_testimonial:'Finding buyers was never easier with AgriMarket.',
+        lakshmi_name:'Lakshmi Singh', lakshmi_testimonial:"As a small farmer, AgriMarket's tools make farming easy.",
+    },
+    hi: {
+        login:'लॉगिन', signup:'साइन अप', eyebrow:'तेलंगाना कृषि मंच',
+        hero_title:'स्मार्ट खेती। बेहतर बिक्री। मजबूत किसान।',
+        hero_sub:'मिट्टी विश्लेषण, फसल सलाह और बाज़ार तक आसान पहुँच।',
+        get_started:'मुफ्त शुरू करें', learn_more:'सुविधाएँ देखें',
+        features_title:'किसान की हर ज़रूरत',
+        soil_analysis:'मिट्टी विश्लेषण', market_trends:'बाजार रुझान',
+        success_stories:'हमारे किसानों की सफलता',
+        ramesh_name:'रमेश कुमार', anita_name:'अनीता देवी',
+        joseph_name:'जोसेफ मैथ्यू', lakshmi_name:'लक्ष्मी सिंह',
+    },
+    te: {
+        login:'లాగిన్', signup:'సైన్ అప్', eyebrow:'తెలంగాణ వ్యవసాయ వేదిక',
+        hero_title:'తెలివిగా పెంచండి. బాగా అమ్మండి.',
+        hero_sub:'మట్టి విశ్లేషణ, పంట సలహా మరియు మార్కెట్ యాక్సెస్.',
+        get_started:'ఉచితంగా ప్రారంభించండి', learn_more:'లక్షణాలు చూడండి',
+        market_trends:'మార్కెట్ ట్రెండ్స్', success_stories:'మన రైతుల విజయ కథలు',
+        ramesh_name:'రమేష్ కుమార్', anita_name:'అనితా దేవి',
+        joseph_name:'జోసెఫ్ మాథ్యూ', lakshmi_name:'లక్ష్మి సింగ్',
+    }
+};
+function applyLang(lang) {
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        const k = el.getAttribute('data-i18n');
+        if (t[lang] && t[lang][k]) el.textContent = t[lang][k];
+    });
+}
+document.getElementById('langSel').addEventListener('change', e => {
+    localStorage.setItem('agri_lang', e.target.value);
+    applyLang(e.target.value);
+});
+const saved = localStorage.getItem('agri_lang') || 'en';
+document.getElementById('langSel').value = saved;
+applyLang(saved);
+
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal-overlay').forEach(m => {
+    m.addEventListener('click', e => { if(e.target===m) m.classList.remove('open'); });
+});
+
+// Smooth scroll for anchor links
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+        e.preventDefault();
+        document.querySelector(a.getAttribute('href'))?.scrollIntoView({behavior:'smooth'});
+    });
+});
+</script>
 </body>
 </html>
