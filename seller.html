@@ -3,92 +3,921 @@
 <head>
     <meta charset="UTF-8">
     <title>Seller Home</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
-        body { font-family: Arial, sans-serif; margin: 40px; background: #f9f9f9; }
-        .container { background: #fff; padding: 30px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.07); max-width: 500px; margin: auto; }
-        h1 { color: #2d6a4f; }
-        ol { margin-top: 20px; }
-        li { margin-bottom: 12px; font-size: 1.1em; }
-        .btn-select-agent {
-            display: inline-block;
-            margin-top: 24px;
-            padding: 12px 28px;
-            background: #40916c;
-            color: #fff;
-            border: none;
-            border-radius: 6px;
-            font-size: 1.1em;
-            text-decoration: none;
-            transition: background 0.2s;
-            cursor: pointer;
+        /* ══════════════════════════════════════
+           DESIGN TOKENS
+           ══════════════════════════════════════ */
+        :root {
+            --soil-900:#1a0f06; --soil-800:#2d1b0e; --soil-700:#3e2718;
+            --soil-600:#5c3a1e; --soil-500:#6d4c41; --soil-400:#8b6914;
+            --soil-300:#a67c3d; --soil-200:#c4a265; --soil-100:#e0ccb0;
+            --green-900:#1b5e20; --green-800:#2e7d32; --green-700:#388e3c;
+            --green-600:#43a047; --green-500:#4caf50; --green-400:#66bb6a;
+            --green-300:#81c784; --green-200:#a5d6a7; --green-100:#c8e6c9;
+            --green-50:#e8f5e9;
+            --gold-700:#b8860b; --gold-600:#d4a017; --gold-500:#e6b422;
+            --gold-400:#f0d060; --gold-300:#f5e08a; --gold-100:#fdf3c4;
+            --sun-600:#ff8f00; --sun-500:#ffa000;
+            --cream:#faf6ed; --cream-light:#fffef5;
+            --white:#ffffff;
+            --error:#d32f2f; --error-bg:#fff1f0; --error-border:#ffa39e;
+            --success:#2e7d32; --success-bg:#e6ffed; --success-border:#b7eb8f;
+            --warn:#ad8b00; --warn-bg:#fffbe6; --warn-border:#ffe58f;
+            --blue:#2a7ae2; --blue-bg:#e3f0ff; --blue-border:#91d5ff;
+            --radius-sm:8px; --radius-md:14px; --radius-lg:20px; --radius-xl:28px;
+            --shadow-sm:0 1px 3px rgba(30,20,10,0.06);
+            --shadow-md:0 4px 16px rgba(30,20,10,0.08), 0 1px 4px rgba(30,20,10,0.04);
+            --shadow-lg:0 12px 40px rgba(30,20,10,0.12), 0 4px 12px rgba(30,20,10,0.06);
+            --shadow-green:0 8px 32px rgba(46,125,50,0.18);
+            --shadow-gold:0 8px 24px rgba(212,160,23,0.12);
+            --transition-fast:0.15s ease;
+            --transition-base:0.25s ease;
+            --transition-smooth:0.4s cubic-bezier(0.4,0,0.2,1);
+            --transition-bounce:0.5s cubic-bezier(0.34,1.56,0.64,1);
         }
-        .btn-select-agent:hover {
-            background: #26734d;
+
+        *,*::before,*::after { margin:0; padding:0; box-sizing:border-box; }
+
+        body {
+            font-family:'DM Sans',sans-serif;
+            background:var(--cream);
+            min-height:100vh;
+            color:var(--soil-700);
+            -webkit-font-smoothing:antialiased;
+            overflow-x:hidden;
         }
+
+        /* ══════════════════════════════════════
+           ATMOSPHERIC BACKGROUND
+           ══════════════════════════════════════ */
+        .bg-layer { position:fixed; inset:0; z-index:0; pointer-events:none; }
+        .bg-gradient {
+            background:
+                radial-gradient(ellipse 80% 50% at 15% 85%, rgba(46,125,50,0.06) 0%, transparent 60%),
+                radial-gradient(ellipse 80% 50% at 85% 85%, rgba(139,105,20,0.06) 0%, transparent 60%),
+                radial-gradient(ellipse 100% 70% at 50% 110%, var(--green-50) 0%, transparent 50%),
+                radial-gradient(circle at 50% 20%, rgba(255,255,255,0.5) 0%, transparent 40%),
+                linear-gradient(175deg, #eef4ee 0%, var(--cream) 35%, #f5edd8 70%, #f0e4c8 100%);
+        }
+        .bg-noise {
+            opacity:0.022;
+            background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+            background-size:200px;
+        }
+
+        /* ── Floating Particles ── */
+        .particle-layer { z-index:1; }
+        .particle {
+            position:fixed; border-radius:50%; opacity:0;
+            animation:floatUp linear infinite;
+        }
+        .particle.seed {
+            background:var(--gold-600); width:5px; height:7px;
+            border-radius:40% 60% 55% 45%; filter:blur(0.3px);
+        }
+        .particle.pollen {
+            background:var(--gold-300); width:3px; height:3px; filter:blur(0.5px);
+        }
+        .particle.leaf-bit {
+            background:var(--green-300); width:4px; height:7px;
+            border-radius:2px 60% 2px 60%; filter:blur(0.2px);
+        }
+        @keyframes floatUp {
+            0%   { transform:translateY(105vh) rotate(0deg) scale(0.8); opacity:0; }
+            8%   { opacity:0.5; }
+            85%  { opacity:0.3; }
+            100% { transform:translateY(-8vh) rotate(400deg) scale(1.1); opacity:0; }
+        }
+
+        /* ══════════════════════════════════════
+           STICKY HEADER BAR
+           ══════════════════════════════════════ */
+        .header-bar {
+            position:sticky; top:0; z-index:50;
+            background:rgba(250,246,237,0.88);
+            backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+            border-bottom:1px solid rgba(46,125,50,0.08);
+            padding:12px 28px;
+            display:flex; align-items:center; justify-content:space-between;
+        }
+        .header-brand {
+            display:flex; align-items:center; gap:10px;
+            font-weight:800; font-size:18px; color:var(--green-800);
+        }
+        .header-brand .brand-icon {
+            width:34px; height:34px;
+            background:linear-gradient(135deg, var(--green-800), var(--green-600));
+            border-radius:var(--radius-sm);
+            display:flex; align-items:center; justify-content:center;
+            color:#fff; font-size:16px;
+        }
+        .header-right {
+            display:flex; align-items:center; gap:16px;
+        }
+        .user-badge {
+            display:flex; align-items:center; gap:8px;
+            background:var(--green-50);
+            border:1.5px solid var(--green-200);
+            border-radius:var(--radius-md);
+            padding:8px 16px;
+            font-weight:700; font-size:14px; color:var(--green-800);
+        }
+        .user-badge .avatar {
+            width:28px; height:28px;
+            background:linear-gradient(135deg, var(--green-700), var(--gold-600));
+            border-radius:50%; display:flex; align-items:center; justify-content:center;
+            color:#fff; font-size:13px; font-weight:800;
+        }
+        .logout-btn {
+            background:none; border:1.5px solid rgba(46,125,50,0.12);
+            border-radius:var(--radius-sm); padding:8px 14px;
+            color:var(--soil-500); font-size:13px; font-weight:600;
+            cursor:pointer; transition:all var(--transition-base);
+            font-family:inherit; display:flex; align-items:center; gap:6px;
+        }
+        .logout-btn:hover { background:rgba(46,125,50,0.04); border-color:var(--green-300); color:var(--green-700); }
+
+        /* ══════════════════════════════════════
+           MAIN LAYOUT
+           ══════════════════════════════════════ */
+        .main-wrap {
+            position:relative; z-index:10;
+            max-width:960px;
+            margin:32px auto 60px;
+            padding:0 20px;
+            display:grid;
+            grid-template-columns:1fr;
+            gap:24px;
+        }
+
+        /* ══════════════════════════════════════
+           WELCOME HERO
+           ══════════════════════════════════════ */
+        .hero-card {
+            background:var(--cream-light);
+            border:1.5px solid rgba(46,125,50,0.10);
+            border-radius:var(--radius-xl);
+            box-shadow:var(--shadow-lg);
+            overflow:hidden;
+            animation:cardReveal 0.6s ease-out both;
+        }
+        @keyframes cardReveal {
+            0% { transform:translateY(20px); opacity:0; }
+            100% { transform:translateY(0); opacity:1; }
+        }
+        .hero-accent {
+            height:5px;
+            background:linear-gradient(90deg, var(--green-800), var(--green-500), var(--gold-600), var(--sun-500), var(--gold-600), var(--green-500), var(--green-800));
+            position:relative; overflow:hidden;
+        }
+        .hero-accent::after {
+            content:''; position:absolute; inset:0;
+            background:linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            animation:shimmer 3.5s ease-in-out infinite alternate;
+        }
+        @keyframes shimmer { 0%{transform:translateX(-100%)} 100%{transform:translateX(100%)} }
+
+        .hero-body {
+            padding:36px 40px;
+            display:flex; align-items:center; gap:24px;
+        }
+        .hero-illustration {
+            width:80px; height:80px;
+            background:linear-gradient(135deg, var(--green-800), var(--green-500));
+            border-radius:20px; display:flex; align-items:center; justify-content:center;
+            color:#fff; font-size:38px;
+            box-shadow:var(--shadow-green);
+            flex-shrink:0;
+            animation:iconFloat 3s ease-in-out infinite alternate;
+        }
+        @keyframes iconFloat { 0%{transform:translateY(0)} 100%{transform:translateY(-4px)} }
+
+        .hero-text h1 {
+            font-family:'Playfair Display',serif;
+            font-weight:800; font-size:30px;
+            color:var(--green-900); line-height:1.2;
+            margin-bottom:6px;
+        }
+        .hero-text .welcome-sub {
+            font-size:15px; color:var(--soil-500); font-weight:500;
+            line-height:1.5;
+        }
+
+        /* ══════════════════════════════════════
+           STATS ROW
+           ══════════════════════════════════════ */
+        .stats-row {
+            display:grid; grid-template-columns:repeat(3, 1fr);
+            gap:16px;
+        }
+        .stat-card {
+            background:var(--cream-light);
+            border:1.5px solid rgba(46,125,50,0.10);
+            border-radius:var(--radius-lg);
+            padding:22px 20px;
+            box-shadow:var(--shadow-md);
+            text-align:center;
+            transition:all var(--transition-base);
+            animation:cardReveal 0.6s ease-out both;
+        }
+        .stat-card:nth-child(1) { animation-delay:0.1s; }
+        .stat-card:nth-child(2) { animation-delay:0.2s; }
+        .stat-card:nth-child(3) { animation-delay:0.3s; }
+
+        .stat-card:hover {
+            transform:translateY(-3px);
+            box-shadow:var(--shadow-lg);
+            border-color:var(--green-200);
+        }
+        .stat-icon {
+            width:44px; height:44px;
+            border-radius:12px;
+            display:flex; align-items:center; justify-content:center;
+            font-size:20px; margin:0 auto 12px;
+        }
+        .stat-icon.green { background:var(--green-50); color:var(--green-700); border:1.5px solid var(--green-200); }
+        .stat-icon.gold  { background:var(--gold-100); color:var(--gold-700); border:1.5px solid var(--gold-300); }
+        .stat-icon.soil  { background:var(--soil-100); color:var(--soil-600); border:1.5px solid var(--soil-200); }
+        .stat-icon.sun   { background:#fff3e0; color:var(--sun-600); border:1.5px solid #ffe0b2; }
+
+        .stat-value {
+            font-size:28px; font-weight:800; color:var(--green-900);
+            line-height:1; margin-bottom:4px;
+        }
+        .stat-label {
+            font-size:13px; font-weight:600; color:var(--soil-500);
+            letter-spacing:0.3px;
+        }
+
+        /* ══════════════════════════════════════
+           STEPS SECTION
+           ══════════════════════════════════════ */
+        .steps-card {
+            background:var(--cream-light);
+            border:1.5px solid rgba(46,125,50,0.10);
+            border-radius:var(--radius-xl);
+            box-shadow:var(--shadow-lg);
+            overflow:hidden;
+            animation:cardReveal 0.6s ease-out 0.15s both;
+        }
+        .steps-header {
+            padding:28px 36px 0;
+            display:flex; align-items:center; gap:12px;
+        }
+        .steps-header h2 {
+            font-family:'Playfair Display',serif;
+            font-weight:800; font-size:22px; color:var(--green-900);
+        }
+        .steps-header .steps-badge {
+            background:var(--green-50); border:1.5px solid var(--green-200);
+            border-radius:var(--radius-sm); padding:4px 12px;
+            font-size:12px; font-weight:700; color:var(--green-700);
+        }
+
+        .steps-body { padding:24px 36px 32px; }
+
+        .step-item {
+            display:flex; align-items:flex-start; gap:16px;
+            padding:16px 0;
+            border-bottom:1px solid rgba(46,125,50,0.06);
+            transition:all var(--transition-base);
+        }
+        .step-item:last-child { border-bottom:none; }
+        .step-item:hover { transform:translateX(4px); }
+
+        .step-num {
+            width:40px; height:40px;
+            background:linear-gradient(135deg, var(--green-800), var(--green-600));
+            border-radius:12px; display:flex; align-items:center; justify-content:center;
+            color:#fff; font-size:16px; font-weight:800;
+            flex-shrink:0;
+            box-shadow:0 3px 10px rgba(46,125,50,0.15);
+        }
+        .step-content .step-title {
+            font-weight:700; font-size:16px; color:var(--soil-800);
+            margin-bottom:3px;
+        }
+        .step-content .step-desc {
+            font-size:14px; color:var(--soil-500); line-height:1.5;
+        }
+
+        .steps-action {
+            padding:0 36px 32px;
+        }
+        .btn-primary {
+            display:inline-flex; align-items:center; gap:10px;
+            background:linear-gradient(135deg, var(--green-800), var(--green-600));
+            color:#fff; border:none;
+            padding:16px 32px; border-radius:var(--radius-md);
+            font-size:16px; font-weight:700;
+            font-family:inherit; cursor:pointer;
+            box-shadow:var(--shadow-green);
+            transition:all var(--transition-base);
+            text-decoration:none;
+            position:relative; overflow:hidden;
+        }
+        .btn-primary::before {
+            content:''; position:absolute; top:0; left:0; right:0; height:50%;
+            background:linear-gradient(180deg, rgba(255,255,255,0.18), transparent);
+            border-radius:var(--radius-md) var(--radius-md) 0 0;
+        }
+        .btn-primary:hover {
+            transform:translateY(-2px);
+            box-shadow:0 10px 36px rgba(46,125,50,0.28);
+        }
+        .btn-primary:active { transform:translateY(0); }
+
+        /* ══════════════════════════════════════
+           NOTIFICATIONS / SALE REQUESTS
+           ══════════════════════════════════════ */
+        .notif-card {
+            background:var(--cream-light);
+            border:1.5px solid rgba(46,125,50,0.10);
+            border-radius:var(--radius-xl);
+            box-shadow:var(--shadow-lg);
+            overflow:hidden;
+            animation:cardReveal 0.6s ease-out 0.25s both;
+        }
+        .notif-header {
+            padding:28px 36px 0;
+            display:flex; align-items:center; justify-content:space-between;
+        }
+        .notif-header h2 {
+            font-family:'Playfair Display',serif;
+            font-weight:800; font-size:22px; color:var(--green-900);
+            display:flex; align-items:center; gap:10px;
+        }
+        .notif-header h2 i { color:var(--gold-600); }
+        .notif-count {
+            background:var(--gold-100); border:1.5px solid var(--gold-300);
+            border-radius:var(--radius-sm); padding:4px 14px;
+            font-size:13px; font-weight:700; color:var(--gold-700);
+        }
+
+        .notif-body { padding:20px 36px 32px; }
+
+        /* ── Section Tabs ── */
+        .section-tabs {
+            display:flex; gap:8px; margin-bottom:20px;
+        }
+        .section-tab {
+            padding:10px 18px; border-radius:var(--radius-sm);
+            font-size:14px; font-weight:700; cursor:pointer;
+            transition:all var(--transition-base);
+            border:1.5px solid transparent;
+            background:var(--white);
+            color:var(--soil-500);
+            display:flex; align-items:center; gap:7px;
+        }
+        .section-tab:hover { background:var(--green-50); border-color:var(--green-200); color:var(--green-700); }
+        .section-tab.active-pending { background:var(--warn-bg); border-color:var(--warn-border); color:var(--warn); }
+        .section-tab.active-accepted { background:var(--success-bg); border-color:var(--success-border); color:var(--success); }
+        .section-tab.active-rejected { background:var(--error-bg); border-color:var(--error-border); color:var(--error); }
+        .section-tab .tab-dot {
+            width:8px; height:8px; border-radius:50%;
+        }
+        .section-tab .dot-yellow { background:var(--warn); }
+        .section-tab .dot-green  { background:var(--success); }
+        .section-tab .dot-red    { background:var(--error); }
+
+        /* ── Sale Request Items ── */
+        .sale-section { display:none; }
+        .sale-section.visible { display:block; }
+
+        .sale-item {
+            border-radius:var(--radius-md);
+            padding:20px 22px;
+            margin-bottom:14px;
+            border:1.5px solid;
+            transition:all var(--transition-base);
+            position:relative;
+            overflow:hidden;
+        }
+        .sale-item::before {
+            content:''; position:absolute; left:0; top:0; bottom:0; width:4px;
+            border-radius:4px 0 0 4px;
+        }
+
+        /* Pending */
+        .sale-item.pending {
+            background:var(--warn-bg); border-color:var(--warn-border);
+        }
+        .sale-item.pending::before { background:var(--warn); }
+
+        /* Accepted */
+        .sale-item.accepted {
+            background:var(--success-bg); border-color:var(--success-border);
+        }
+        .sale-item.accepted::before { background:var(--success); }
+
+        /* Rejected */
+        .sale-item.rejected {
+            background:var(--error-bg); border-color:var(--error-border);
+        }
+        .sale-item.rejected::before { background:var(--error); }
+
+        .sale-item:hover { transform:translateX(3px); box-shadow:var(--shadow-md); }
+
+        .sale-top {
+            display:flex; align-items:center; justify-content:space-between;
+            margin-bottom:12px;
+        }
+        .sale-crop {
+            font-weight:800; font-size:18px; color:var(--soil-800);
+            display:flex; align-items:center; gap:8px;
+        }
+        .sale-crop i { color:var(--green-600); }
+        .sale-status-badge {
+            font-size:12px; font-weight:700;
+            padding:4px 12px; border-radius:20px;
+            letter-spacing:0.3px;
+        }
+        .sale-status-badge.pending { background:var(--warn); color:#fff; }
+        .sale-status-badge.accepted { background:var(--success); color:#fff; }
+        .sale-status-badge.rejected { background:var(--error); color:#fff; }
+
+        .sale-details {
+            display:grid; grid-template-columns:1fr 1fr;
+            gap:8px; margin-bottom:14px;
+        }
+        .sale-detail {
+            font-size:14px; color:var(--soil-600);
+            display:flex; align-items:center; gap:6px;
+        }
+        .sale-detail i { color:var(--soil-400); font-size:13px; width:16px; text-align:center; }
+        .sale-detail strong { color:var(--soil-800); }
+
+        .sale-actions {
+            display:flex; align-items:center; gap:10px;
+        }
+        .btn-accept {
+            display:inline-flex; align-items:center; gap:7px;
+            background:linear-gradient(135deg, var(--green-800), var(--green-600));
+            color:#fff; border:none;
+            padding:10px 22px; border-radius:var(--radius-sm);
+            font-size:14px; font-weight:700;
+            font-family:inherit; cursor:pointer;
+            box-shadow:0 3px 10px rgba(46,125,50,0.15);
+            transition:all var(--transition-base);
+        }
+        .btn-accept:hover { transform:translateY(-1px); box-shadow:0 6px 20px rgba(46,125,50,0.25); }
+
+        .btn-reject {
+            display:inline-flex; align-items:center; gap:7px;
+            background:linear-gradient(135deg, var(--error), #e53935);
+            color:#fff; border:none;
+            padding:10px 22px; border-radius:var(--radius-sm);
+            font-size:14px; font-weight:700;
+            font-family:inherit; cursor:pointer;
+            box-shadow:0 3px 10px rgba(211,47,47,0.15);
+            transition:all var(--transition-base);
+        }
+        .btn-reject:hover { transform:translateY(-1px); box-shadow:0 6px 20px rgba(211,47,47,0.25); }
+
+        .sale-confirmed-label {
+            display:inline-flex; align-items:center; gap:6px;
+            font-size:14px; font-weight:700;
+        }
+        .sale-confirmed-label.accepted { color:var(--success); }
+        .sale-confirmed-label.rejected { color:var(--error); }
+
+        /* ── Empty State ── */
+        .empty-state {
+            text-align:center; padding:32px 20px;
+            color:var(--soil-400);
+        }
+        .empty-state i { font-size:36px; margin-bottom:12px; color:var(--soil-300); }
+        .empty-state p { font-size:14px; font-weight:600; }
+
+        /* ══════════════════════════════════════
+           TOAST
+           ══════════════════════════════════════ */
+        .toast-container {
+            position:fixed; top:20px; right:20px; z-index:200;
+            display:flex; flex-direction:column; gap:10px;
+        }
+        .toast {
+            background:var(--white);
+            border-radius:var(--radius-md);
+            padding:16px 20px;
+            display:flex; align-items:center; gap:12px;
+            box-shadow:var(--shadow-lg);
+            transform:translateX(130%);
+            transition:transform var(--transition-bounce);
+            min-width:300px; position:relative; overflow:hidden;
+        }
+        .toast.show { transform:translateX(0); }
+        .toast-icon {
+            width:36px; height:36px; border-radius:10px;
+            display:flex; align-items:center; justify-content:center;
+            color:#fff; font-size:16px; flex-shrink:0;
+        }
+        .toast-icon.success { background:linear-gradient(135deg, var(--green-800), var(--green-500)); }
+        .toast-icon.error   { background:linear-gradient(135deg, var(--error), #e53935); }
+        .toast-title { font-weight:700; font-size:14px; }
+        .toast-title.success { color:var(--success); }
+        .toast-title.error   { color:var(--error); }
+        .toast-msg { font-size:13px; color:var(--soil-500); margin-top:2px; }
+        .toast-close {
+            background:none; border:none; color:var(--soil-400); cursor:pointer;
+            font-size:14px; padding:4px; margin-left:auto;
+            transition:color var(--transition-fast);
+        }
+        .toast-close:hover { color:var(--soil-700); }
+        .toast-bar {
+            position:absolute; bottom:0; left:14px; right:14px;
+            height:3px; border-radius:2px;
+            background:var(--green-100); overflow:hidden;
+        }
+        .toast-bar .fill { height:100%; border-radius:2px; animation:progressFill 3.5s linear forwards; }
+        .toast-bar .fill.success { background:var(--green-600); }
+        .toast-bar .fill.error   { background:var(--error); }
+        @keyframes progressFill { 0%{width:100%} 100%{width:0%} }
+
+        /* ══════════════════════════════════════
+           RESPONSIVE
+           ══════════════════════════════════════ */
+        @media (max-width:768px) {
+            .stats-row { grid-template-columns:1fr; }
+            .hero-body { flex-direction:column; text-align:center; }
+            .notif-header { flex-direction:column; gap:10px; }
+            .sale-details { grid-template-columns:1fr; }
+            .section-tabs { flex-wrap:wrap; }
+        }
+        @media (max-width:480px) {
+            .main-wrap { padding:0 12px; }
+            .hero-body, .steps-body, .steps-action, .notif-body, .notif-header, .steps-header { padding-left:20px; padding-right:20px; }
+            .hero-text h1 { font-size:24px; }
+            .sale-actions { flex-direction:column; }
+            .btn-accept, .btn-reject { width:100%; justify-content:center; }
+        }
+
+        /* ── Accessibility ── */
+        @media (prefers-reduced-motion:reduce) {
+            *,*::before,*::after {
+                animation-duration:0.01ms !important;
+                transition-duration:0.01ms !important;
+            }
+        }
+        :focus-visible { outline:2px solid var(--green-700); outline-offset:2px; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div style="background:#fffbe6;padding:16px 18px;border-radius:10px;box-shadow:0 2px 8px rgba(42,122,226,0.08);margin-bottom:18px;text-align:left;">
-            <span style="font-size:1.1em;color:#888;font-weight:bold;">Username:</span>
-            <span style="font-size:1.1em;color:#2a7ae2;">{{ session['username'] if session['username'] else 'Unknown' }}</span>
+
+    <!-- ═══ Background ═══ -->
+    <div class="bg-layer bg-gradient"></div>
+    <div class="bg-layer bg-noise"></div>
+    <div class="bg-layer particle-layer" id="particleBox"></div>
+
+    <!-- ═══ Toast ═══ -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- ═══ Header ═══ -->
+    <header class="header-bar">
+        <div class="header-brand">
+            <div class="brand-icon"><i class="fa-solid fa-seedling"></i></div>
+            AgriConnect
         </div>
-        <div style="background:#e3f0ff;padding:22px 18px;border-radius:10px;box-shadow:0 2px 8px rgba(42,122,226,0.08);margin-bottom:24px;text-align:center;">
-            <h2 style="color:#2a7ae2;margin:0 0 8px 0;">Your Profit Dashboard</h2>
-            <!-- Profit value removed as requested -->
+        <div class="header-right">
+            <div class="user-badge">
+                <div class="avatar">{{ session['username'][0] if session['username'] else 'U' }}</div>
+                {{ session['username'] if session['username'] else 'Unknown' }}
+            </div>
+            <a href="/logout" class="logout-btn"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
         </div>
+    </header>
+
+    <!-- ═══ Main Content ═══ -->
+    <main class="main-wrap">
+
+        <!-- ── Hero Welcome ── -->
+        <div class="hero-card">
+            <div class="hero-accent"></div>
+            <div class="hero-body">
+                <div class="hero-illustration">
+                    <i class="fa-solid fa-store"></i>
+                </div>
+                <div class="hero-text">
+                    <h1>Seller Dashboard</h1>
+                    <p class="welcome-sub">Welcome back, {{ session['username'] if session['username'] else 'Seller' }}. Manage your crop listings, review sale requests, and track your marketplace activity.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── Stats Row ── -->
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="stat-icon green"><i class="fa-solid fa-wheat-awn"></i></div>
+                <div class="stat-value" id="statPending">0</div>
+                <div class="stat-label">Pending Requests</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon gold"><i class="fa-solid fa-handshake"></i></div>
+                <div class="stat-value" id="statAccepted">0</div>
+                <div class="stat-label">Accepted Sales</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon soil"><i class="fa-solid fa-boxes-stacked"></i></div>
+                <div class="stat-value" id="statRejected">0</div>
+                <div class="stat-label">Rejected Sales</div>
+            </div>
+        </div>
+
+        <!-- ── Steps Section ── -->
+        <div class="steps-card">
+            <div class="steps-header">
+                <h2>Getting Started</h2>
+                <span class="steps-badge">5 Steps</span>
+            </div>
+            <div class="steps-body">
+                <div class="step-item">
+                    <div class="step-num">1</div>
+                    <div class="step-content">
+                        <div class="step-title">Select Your Agent</div>
+                        <div class="step-desc">Choose a field agent in your district who will verify and support your listings.</div>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-num">2</div>
+                    <div class="step-content">
+                        <div class="step-title">List Your Crops</div>
+                        <div class="step-desc">Add the crops you want to sell with details like variety and grade.</div>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-num">3</div>
+                    <div class="step-content">
+                        <div class="step-title">Set Prices and Quantities</div>
+                        <div class="step-desc">Define competitive prices and available stock for each crop listing.</div>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-num">4</div>
+                    <div class="step-content">
+                        <div class="step-title">Review and Confirm</div>
+                        <div class="step-desc">Double-check all details before making your listings live on the marketplace.</div>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-num">5</div>
+                    <div class="step-content">
+                        <div class="step-title">Track Sales and Orders</div>
+                        <div class="step-desc">Monitor incoming requests, accept or reject offers, and manage ongoing sales.</div>
+                    </div>
+                </div>
+            </div>
+            <div class="steps-action">
+                <a href="/selectagent" class="btn-primary">
+                    <i class="fa-solid fa-user-tie"></i>
+                    Select Agent
+                    <i class="fa-solid fa-arrow-right" style="font-size:14px"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- ── Notifications / Sale Requests ── -->
         {% if notifications %}
-        <div style="background:#fffbe6;padding:18px 18px;border-radius:10px;box-shadow:0 2px 8px rgba(42,122,226,0.08);margin-bottom:24px;">
-            <h3 style="color:#ad8b00;">Product Sale Requests</h3>
-            {% for note in notifications %}
-                {% if note.status == 'buy_request' %}
-                <div style="background:#fff;border-radius:8px;padding:14px 12px;margin-bottom:12px;box-shadow:0 1px 4px rgba(42,122,226,0.06);">
-                    <p><strong>Crop:</strong> {{ note.cropname }}</p>
-                    <p><strong>Quantity:</strong> {{ note.quantity }} kg</p>
-                    <p><strong>Buyer:</strong> {{ note.buyer_username }}</p>
-                    <form action="/accept_sale/{{ note._id }}" method="post" style="display:inline;">
-                        <button type="submit" style="background:#52c41a;color:#fff;padding:6px 18px;border:none;border-radius:6px;">Yes</button>
-                    </form>
-                    <form action="/reject_sale/{{ note._id }}" method="post" style="display:inline;">
-                        <button type="submit" style="background:#ff4d4f;color:#fff;padding:6px 18px;border:none;border-radius:6px;">No</button>
-                    </form>
+        <div class="notif-card">
+            <div class="notif-header">
+                <h2><i class="fa-solid fa-bell"></i> Sale Requests</h2>
+                <span class="notif-count">{{ notifications|length }} Total</span>
+            </div>
+            <div class="notif-body">
+                <!-- Section Tabs -->
+                <div class="section-tabs">
+                    <div class="section-tab active-pending" data-section="pending" tabindex="0">
+                        <span class="tab-dot dot-yellow"></span>
+                        Pending
+                    </div>
+                    <div class="section-tab" data-section="accepted" tabindex="0">
+                        <span class="tab-dot dot-green"></span>
+                        Accepted
+                    </div>
+                    <div class="section-tab" data-section="rejected" tabindex="0">
+                        <span class="tab-dot dot-red"></span>
+                        Rejected
+                    </div>
                 </div>
-                {% endif %}
-            {% endfor %}
-            <h3 style="color:#52c41a;">Accepted Sales</h3>
-            {% for note in notifications %}
-                {% if note.status == 'sale_accepted' %}
-                <div style="background:#e6ffed;border-radius:8px;padding:14px 12px;margin-bottom:12px;">
-                    <p><strong>Crop:</strong> {{ note.cropname }}</p>
-                    <p><strong>Quantity:</strong> {{ note.quantity }} kg</p>
-                    <p><strong>Buyer:</strong> {{ note.buyer_username }}</p>
-                    <p><strong>Status:</strong> Accepted</p>
+
+                <!-- Pending Requests -->
+                <div class="sale-section visible" id="secPending">
+                    {% for note in notifications %}
+                    {% if note.status == 'buy_request' %}
+                    <div class="sale-item pending">
+                        <div class="sale-top">
+                            <div class="sale-crop"><i class="fa-solid fa-seedling"></i> {{ note.cropname }}</div>
+                            <span class="sale-status-badge pending">Pending</span>
+                        </div>
+                        <div class="sale-details">
+                            <div class="sale-detail"><i class="fa-solid fa-weight-hanging"></i> <strong>{{ note.quantity }} kg</strong></div>
+                            <div class="sale-detail"><i class="fa-solid fa-user"></i> <strong>{{ note.buyer_username }}</strong></div>
+                        </div>
+                        <div class="sale-actions">
+                            <form action="/accept_sale/{{ note._id }}" method="post" style="display:inline;">
+                                <button type="submit" class="btn-accept"><i class="fa-solid fa-check"></i> Accept</button>
+                            </form>
+                            <form action="/reject_sale/{{ note._id }}" method="post" style="display:inline;">
+                                <button type="submit" class="btn-reject"><i class="fa-solid fa-xmark"></i> Reject</button>
+                            </form>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                    {% set pending_count = notifications|selectattr('status','eq','buy_request')|list|length %}
+                    {% if pending_count == 0 %}
+                    <div class="empty-state">
+                        <i class="fa-solid fa-inbox"></i>
+                        <p>No pending requests right now</p>
+                    </div>
+                    {% endif %}
                 </div>
-                {% endif %}
-            {% endfor %}
-            <h3 style="color:#ff4d4f;">Rejected Sales</h3>
-            {% for note in notifications %}
-                {% if note.status == 'sale_rejected' %}
-                <div style="background:#fff1f0;border-radius:8px;padding:14px 12px;margin-bottom:12px;">
-                    <p><strong>Crop:</strong> {{ note.cropname }}</p>
-                    <p><strong>Quantity:</strong> {{ note.quantity }} kg</p>
-                    <p><strong>Buyer:</strong> {{ note.buyer_username }}</p>
-                    <p><strong>Status:</strong> Rejected</p>
+
+                <!-- Accepted Sales -->
+                <div class="sale-section" id="secAccepted">
+                    {% for note in notifications %}
+                    {% if note.status == 'sale_accepted' %}
+                    <div class="sale-item accepted">
+                        <div class="sale-top">
+                            <div class="sale-crop"><i class="fa-solid fa-seedling"></i> {{ note.cropname }}</div>
+                            <span class="sale-status-badge accepted">Accepted</span>
+                        </div>
+                        <div class="sale-details">
+                            <div class="sale-detail"><i class="fa-solid fa-weight-hanging"></i> <strong>{{ note.quantity }} kg</strong></div>
+                            <div class="sale-detail"><i class="fa-solid fa-user"></i> <strong>{{ note.buyer_username }}</strong></div>
+                        </div>
+                        <div class="sale-confirmed-label accepted"><i class="fa-solid fa-circle-check"></i> Sale confirmed and active</div>
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                    {% set accepted_count = notifications|selectattr('status','eq','sale_accepted')|list|length %}
+                    {% if accepted_count == 0 %}
+                    <div class="empty-state">
+                        <i class="fa-solid fa-handshake"></i>
+                        <p>No accepted sales yet</p>
+                    </div>
+                    {% endif %}
                 </div>
-                {% endif %}
-            {% endfor %}
+
+                <!-- Rejected Sales -->
+                <div class="sale-section" id="secRejected">
+                    {% for note in notifications %}
+                    {% if note.status == 'sale_rejected' %}
+                    <div class="sale-item rejected">
+                        <div class="sale-top">
+                            <div class="sale-crop"><i class="fa-solid fa-seedling"></i> {{ note.cropname }}</div>
+                            <span class="sale-status-badge rejected">Rejected</span>
+                        </div>
+                        <div class="sale-details">
+                            <div class="sale-detail"><i class="fa-solid fa-weight-hanging"></i> <strong>{{ note.quantity }} kg</strong></div>
+                            <div class="sale-detail"><i class="fa-solid fa-user"></i> <strong>{{ note.buyer_username }}</strong></div>
+                        </div>
+                        <div class="sale-confirmed-label rejected"><i class="fa-solid fa-circle-xmark"></i> Sale was declined</div>
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                    {% set rejected_count = notifications|selectattr('status','eq','sale_rejected')|list|length %}
+                    {% if rejected_count == 0 %}
+                    <div class="empty-state">
+                        <i class="fa-solid fa-ban"></i>
+                        <p>No rejected sales</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
         </div>
         {% endif %}
-        <h1>Seller Home</h1>
-        <p>Follow these steps to get started:</p>
-        <ol>
-            <li><strong>Select the agent</strong></li>
-            <li>List your crops for sale</li>
-            <li>Set your prices and quantities</li>
-            <li>Review and confirm your listings</li>
-            <li>Track sales and manage orders</li>
-        </ol>
-        <a href="/selectagent" class="btn-select-agent">Select Agent</a>
-    </div>
+
+    </main>
+
+    <script>
+        /* ── Floating Particles ── */
+        (() => {
+            const box = document.getElementById('particleBox');
+            const kinds = ['seed','pollen','leaf-bit'];
+            for (let i = 0; i < 16; i++) {
+                const el = document.createElement('div');
+                const k = kinds[Math.floor(Math.random() * kinds.length)];
+                el.className = `particle ${k}`;
+                el.style.left = (Math.random() * 100) + 'vw';
+                el.style.animationDuration = (10 + Math.random() * 16) + 's';
+                el.style.animationDelay = (-Math.random() * 22) + 's';
+                box.appendChild(el);
+            }
+        })();
+
+        /* ── Stats Counter Animation ── */
+        function animateCounter(el, target, duration = 800) {
+            const start = 0;
+            const startTime = performance.now();
+            function update(now) {
+                const elapsed = now - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                const eased = 1 - Math.pow(1 - progress, 3); // ease-out cubic
+                el.textContent = Math.round(start + (target - start) * eased);
+                if (progress < 1) requestAnimationFrame(update);
+            }
+            requestAnimationFrame(update);
+        }
+
+        // Count notification types from rendered DOM
+        const pendingItems = document.querySelectorAll('.sale-item.pending');
+        const acceptedItems = document.querySelectorAll('.sale-item.accepted');
+        const rejectedItems = document.querySelectorAll('.sale-item.rejected');
+
+        animateCounter(document.getElementById('statPending'), pendingItems.length);
+        animateCounter(document.getElementById('statAccepted'), acceptedItems.length);
+        animateCounter(document.getElementById('statRejected'), rejectedItems.length);
+
+        /* ── Section Tab Switching ── */
+        const tabs = document.querySelectorAll('.section-tab');
+        const sections = {
+            pending: document.getElementById('secPending'),
+            accepted: document.getElementById('secAccepted'),
+            rejected: document.getElementById('secRejected')
+        };
+
+        const activeClasses = {
+            pending: 'active-pending',
+            accepted: 'active-accepted',
+            rejected: 'active-rejected'
+        };
+
+        function switchTab(sectionName) {
+            tabs.forEach(t => {
+                t.classList.remove('active-pending','active-accepted','active-rejected');
+            });
+            Object.values(sections).forEach(s => s.classList.remove('visible'));
+
+            const activeTab = document.querySelector(`.section-tab[data-section="${sectionName}"]`);
+            if (activeTab) activeTab.classList.add(activeClasses[sectionName]);
+            if (sections[sectionName]) sections[sectionName].classList.add('visible');
+        }
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => switchTab(tab.dataset.section));
+            tab.addEventListener('keydown', e => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    switchTab(tab.dataset.section);
+                }
+            });
+        });
+
+        // Default to pending
+        switchTab('pending');
+
+        /* ── Toast System ── */
+        const toastBox = document.getElementById('toastContainer');
+
+        function showToast(title, msg, type = 'success', duration = 3500) {
+            const t = document.createElement('div');
+            t.className = 'toast';
+            t.innerHTML = `
+                <div class="toast-icon ${type}"><i class="fa-solid ${type === 'success' ? 'fa-circle-check' : 'fa-circle-xmark'}"></i></div>
+                <div>
+                    <div class="toast-title ${type}">${title}</div>
+                    <div class="toast-msg">${msg}</div>
+                </div>
+                <button class="toast-close" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
+                <div class="toast-bar"><div class="fill ${type}" style="animation-duration:${duration}ms"></div></div>
+            `;
+            toastBox.appendChild(t);
+            requestAnimationFrame(() => requestAnimationFrame(() => t.classList.add('show')));
+            t.querySelector('.toast-close').addEventListener('click', () => removeToast(t));
+            setTimeout(() => removeToast(t), duration);
+        }
+
+        function removeToast(t) {
+            t.classList.remove('show');
+            setTimeout(() => t.remove(), 500);
+        }
+
+        /* ── Accept / Reject Button Feedback ── */
+        document.querySelectorAll('.btn-accept').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                const form = this.closest('form');
+                // For demo: show toast then allow real submit
+                // Remove e.preventDefault() for production POST
+                e.preventDefault();
+                const cropName = this.closest('.sale-item').querySelector('.sale-crop').textContent.trim();
+                showToast('Sale Accepted', `${cropName} offer has been accepted successfully.`, 'success', 4000);
+                // Uncomment for real form submission after toast:
+                // setTimeout(() => form.submit(), 500);
+            });
+        });
+
+        document.querySelectorAll('.btn-reject').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                const form = this.closest('form');
+                e.preventDefault();
+                const cropName = this.closest('.sale-item').querySelector('.sale-crop').textContent.trim();
+                showToast('Sale Rejected', `${cropName} offer has been declined.`, 'error', 4000);
+                // setTimeout(() => form.submit(), 500);
+            });
+        });
+    </script>
 </body>
-</html> 
+</html>
