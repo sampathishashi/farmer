@@ -3,57 +3,1000 @@
 <head>
     <meta charset="UTF-8">
     <title>Send Notification to Agent</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
-        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f4f8fb; margin: 0; }
-        .container { max-width: 600px; margin: 50px auto; background: #fff; border-radius: 14px; box-shadow: 0 2px 16px rgba(42,122,226,0.10); padding: 36px 32px; }
-        h1 { color: #2a7ae2; margin-bottom: 30px; text-align: center; }
-        .form-group { margin-bottom: 24px; }
-        label { display: block; margin-bottom: 8px; font-weight: bold; color: #333; }
-        select, textarea { width: 100%; padding: 12px 16px; border: 2px solid #e1e5e9; border-radius: 8px; font-size: 16px; font-family: inherit; }
-        select:focus, textarea:focus { outline: none; border-color: #2a7ae2; }
-        textarea { min-height: 120px; resize: vertical; }
-        .btn { background: #2a7ae2; color: #fff; border: none; padding: 14px 28px; border-radius: 8px; font-size: 16px; cursor: pointer; transition: background 0.2s; }
-        .btn:hover { background: #155fa0; }
-        .back-btn { display: inline-block; margin-top: 20px; color: #2a7ae2; text-decoration: none; font-weight: bold; }
-        .back-btn:hover { text-decoration: underline; }
-        .agent-info { background: #f8f9fa; padding: 16px; border-radius: 8px; margin-bottom: 20px; }
-        .agent-info p { margin: 4px 0; }
+        :root {
+            --soil-900: #1a0f06;
+            --soil-800: #2d1b0e;
+            --soil-700: #3e2718;
+            --soil-600: #5c3a1e;
+            --soil-500: #6d4c41;
+            --soil-400: #8b6914;
+            --soil-300: #a67c3d;
+            --green-900: #1b5e20;
+            --green-800: #2e7d32;
+            --green-700: #388e3c;
+            --green-600: #43a047;
+            --green-500: #4caf50;
+            --green-400: #66bb6a;
+            --green-300: #81c784;
+            --green-200: #a5d6a7;
+            --green-100: #c8e6c9;
+            --green-50:  #e8f5e9;
+            --gold-700: #b8860b;
+            --gold-600: #d4a017;
+            --gold-500: #e6b422;
+            --gold-400: #f0d060;
+            --gold-300: #f5e08a;
+            --gold-100: #fdf3c4;
+            --sun-600: #ff8f00;
+            --sun-500: #ffa000;
+            --cream:    #faf6ed;
+            --cream-light: #fffef5;
+            --white:    #ffffff;
+            --error:    #d32f2f;
+            --radius-sm: 8px;
+            --radius-md: 14px;
+            --radius-lg: 20px;
+            --radius-xl: 28px;
+            --shadow-sm: 0 1px 3px rgba(30,20,10,0.06);
+            --shadow-md: 0 4px 16px rgba(30,20,10,0.08), 0 1px 4px rgba(30,20,10,0.04);
+            --shadow-lg: 0 12px 40px rgba(30,20,10,0.12), 0 4px 12px rgba(30,20,10,0.06);
+            --shadow-green: 0 8px 32px rgba(46,125,50,0.18);
+            --shadow-gold: 0 8px 24px rgba(212,160,23,0.12);
+            --transition-fast: 0.15s ease;
+            --transition-base: 0.25s ease;
+            --transition-smooth: 0.4s cubic-bezier(0.4,0,0.2,1);
+            --transition-bounce: 0.5s cubic-bezier(0.34,1.56,0.64,1);
+        }
+
+        *,*::before,*::after { margin:0; padding:0; box-sizing:border-box; }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--cream);
+            min-height: 100vh;
+            overflow-x: hidden;
+            color: var(--soil-700);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ══════════════════════════════════════
+           ATMOSPHERIC BACKGROUND LAYERS
+           ══════════════════════════════════════ */
+        .bg-layer {
+            position: fixed; inset: 0; z-index: 0; pointer-events: none;
+        }
+        .bg-gradient {
+            background:
+                radial-gradient(ellipse 80% 50% at 15% 85%, rgba(46,125,50,0.07) 0%, transparent 60%),
+                radial-gradient(ellipse 80% 50% at 85% 85%, rgba(139,105,20,0.07) 0%, transparent 60%),
+                radial-gradient(ellipse 100% 70% at 50% 110%, var(--green-50) 0%, transparent 50%),
+                radial-gradient(circle at 50% 20%, rgba(255,255,255,0.6) 0%, transparent 40%),
+                linear-gradient(175deg, #eef4ee 0%, var(--cream) 35%, #f5edd8 70%, #f0e4c8 100%);
+        }
+        .bg-noise {
+            opacity: 0.025;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+            background-size: 200px;
+        }
+
+        /* ── Floating Particles ── */
+        .particle-layer { z-index: 1; }
+        .particle {
+            position: fixed; border-radius: 50%; opacity: 0;
+            animation: floatUp linear infinite;
+        }
+        .particle.seed {
+            background: var(--gold-600);
+            width: 5px; height: 7px;
+            border-radius: 40% 60% 55% 45%;
+            filter: blur(0.3px);
+        }
+        .particle.pollen {
+            background: var(--gold-300);
+            width: 3px; height: 3px;
+            filter: blur(0.5px);
+        }
+        .particle.leaf {
+            background: var(--green-300);
+            width: 4px; height: 7px;
+            border-radius: 2px 60% 2px 60%;
+            filter: blur(0.2px);
+        }
+        @keyframes floatUp {
+            0%   { transform: translateY(105vh) rotate(0deg) scale(0.8); opacity:0; }
+            8%   { opacity:0.55; }
+            85%  { opacity:0.35; }
+            100% { transform: translateY(-8vh) rotate(400deg) scale(1.1); opacity:0; }
+        }
+
+        /* ── Decorative Wheat SVGs ── */
+        .deco-wheat {
+            position: fixed; z-index: 1; pointer-events: none;
+            opacity: 0.08;
+            animation: sway 7s ease-in-out infinite alternate;
+        }
+        .deco-wheat.left  { left:20px;  bottom:50px; }
+        .deco-wheat.right { right:20px; bottom:50px; animation-delay:-3.5s; }
+        @keyframes sway { 0%{transform:rotate(-2deg)} 100%{transform:rotate(2deg)} }
+
+        /* ══════════════════════════════════════
+           HEADER BAR
+           ══════════════════════════════════════ */
+        .header-bar {
+            position: sticky; top: 0; z-index: 50;
+            background: rgba(250,246,237,0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(46,125,50,0.08);
+            padding: 14px 24px;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .header-brand {
+            display: flex; align-items: center; gap: 10px;
+            font-weight: 800; font-size: 18px; color: var(--green-800);
+        }
+        .header-brand .brand-icon {
+            width: 34px; height: 34px;
+            background: linear-gradient(135deg, var(--green-800), var(--green-600));
+            border-radius: var(--radius-sm);
+            display: flex; align-items: center; justify-content: center;
+            color: #fff; font-size: 16px;
+        }
+        .header-nav {
+            display: flex; align-items: center; gap: 6px;
+            font-size: 13px; color: var(--soil-500);
+        }
+        .header-nav a { color: var(--green-700); text-decoration:none; font-weight:600; transition: color var(--transition-fast); }
+        .header-nav a:hover { color: var(--green-900); }
+        .header-nav .sep { color: var(--soil-300); margin: 0 2px; }
+        .header-nav .current { color: var(--soil-700); font-weight:700; }
+
+        /* ══════════════════════════════════════
+           MAIN CARD
+           ══════════════════════════════════════ */
+        .main-wrap {
+            position: relative; z-index: 10;
+            max-width: 680px;
+            margin: 40px auto 60px;
+            padding: 0 16px;
+        }
+        .card {
+            background: var(--cream-light);
+            border: 1.5px solid rgba(46,125,50,0.10);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
+            animation: cardReveal 0.7s ease-out both;
+        }
+        @keyframes cardReveal {
+            0%   { transform: translateY(24px); opacity:0; }
+            100% { transform: translateY(0); opacity:1; }
+        }
+
+        /* ── Card Top Accent ── */
+        .card-accent {
+            height: 5px;
+            background: linear-gradient(90deg, var(--green-800) 0%, var(--green-500) 30%, var(--gold-600) 55%, var(--sun-500) 75%, var(--gold-600) 90%, var(--green-500) 100%);
+            position: relative;
+        }
+        .card-accent::after {
+            content: '';
+            position: absolute; inset: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent);
+            animation: accentShimmer 3.5s ease-in-out infinite alternate;
+        }
+        @keyframes accentShimmer { 0%{transform:translateX(-100%)} 100%{transform:translateX(100%)} }
+
+        /* ── Card Header ── */
+        .card-header {
+            padding: 36px 40px 0;
+        }
+        .card-header h1 {
+            font-family: 'Playfair Display', serif;
+            font-weight: 800;
+            font-size: 30px;
+            color: var(--green-900);
+            line-height: 1.2;
+            margin-bottom: 6px;
+            display: flex; align-items: center; gap: 14px;
+        }
+        .card-header h1 .h-icon {
+            width: 50px; height: 50px;
+            background: linear-gradient(135deg, var(--green-800), var(--green-500));
+            border-radius: 14px;
+            display: flex; align-items: center; justify-content: center;
+            color: #fff; font-size: 24px;
+            box-shadow: var(--shadow-green);
+            flex-shrink: 0;
+        }
+        .card-header .subtitle {
+            font-size: 15px; color: var(--soil-500); font-weight:500;
+            margin-bottom: 0;
+            padding-left: 64px;
+        }
+
+        /* ── Divider ── */
+        .divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(46,125,50,0.12), rgba(212,160,23,0.08), transparent);
+            margin: 28px 40px 0;
+        }
+
+        /* ── Card Body ── */
+        .card-body {
+            padding: 32px 40px 40px;
+        }
+
+        /* ══════════════════════════════════════
+           AGENT PREVIEW
+           ══════════════════════════════════════ */
+        .agent-preview {
+            border: 1.5px solid rgba(46,125,50,0.12);
+            border-radius: var(--radius-md);
+            background: linear-gradient(135deg, var(--green-50), var(--gold-100));
+            padding: 0;
+            margin-bottom: 28px;
+            display: flex; align-items: center; gap: 16px;
+            max-height: 0; overflow: hidden; opacity: 0;
+            transition: all var(--transition-smooth);
+        }
+        .agent-preview.visible {
+            max-height: 100px; opacity: 1;
+            padding: 16px 20px;
+        }
+        .agent-avatar {
+            width: 48px; height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--green-700), var(--gold-600));
+            display: flex; align-items: center; justify-content: center;
+            color: #fff; font-size: 20px; font-weight: 800;
+            font-family: 'DM Sans', sans-serif;
+            box-shadow: 0 3px 10px rgba(46,125,50,0.2);
+            flex-shrink: 0;
+        }
+        .agent-meta .agent-name {
+            font-weight: 700; font-size: 16px; color: var(--green-800);
+        }
+        .agent-meta .agent-district {
+            font-size: 13px; color: var(--soil-500); margin-top: 2px;
+            display: flex; align-items: center; gap: 5px;
+        }
+        .agent-meta .agent-district i { font-size: 11px; color: var(--green-500); }
+        .agent-status {
+            margin-left: auto;
+            display: flex; align-items: center; gap: 6px;
+            font-size: 12px; color: var(--green-700); font-weight: 600;
+        }
+        .agent-status .dot {
+            width: 8px; height: 8px; border-radius: 50%;
+            background: var(--green-500);
+            animation: pulse 2s ease-in-out infinite;
+        }
+        @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.8)} }
+
+        /* ══════════════════════════════════════
+           FORM GROUPS
+           ══════════════════════════════════════ */
+        .form-group {
+            margin-bottom: 28px;
+            position: relative;
+        }
+        .form-label {
+            display: flex; align-items: center; gap: 8px;
+            font-weight: 700; font-size: 14px;
+            color: var(--soil-800);
+            margin-bottom: 10px;
+            letter-spacing: 0.3px;
+        }
+        .form-label i {
+            width: 20px; text-align: center;
+            color: var(--green-600); font-size: 15px;
+        }
+        .form-label .required {
+            color: var(--error); font-size: 11px; font-weight: 500;
+        }
+
+        /* ── Select Field ── */
+        .select-wrap { position: relative; }
+        .select-wrap .sel-icon {
+            position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+            color: var(--green-500); font-size: 15px;
+            pointer-events: none; z-index: 2;
+            transition: color var(--transition-fast);
+        }
+        .select-wrap .sel-arrow {
+            position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+            color: var(--soil-400); font-size: 12px;
+            pointer-events: none; z-index: 2;
+            transition: transform var(--transition-base), color var(--transition-fast);
+        }
+        .select-wrap:focus-within .sel-arrow {
+            transform: translateY(-50%) rotate(180deg);
+            color: var(--green-600);
+        }
+        .select-wrap:focus-within .sel-icon { color: var(--green-800); }
+
+        select {
+            width: 100%;
+            padding: 14px 38px 14px 42px;
+            border: 2px solid rgba(46,125,50,0.15);
+            border-radius: var(--radius-md);
+            font-size: 15px; font-family: 'DM Sans', sans-serif;
+            background: var(--white);
+            color: var(--soil-800);
+            appearance: none; cursor: pointer;
+            transition: all var(--transition-base);
+            font-weight: 500;
+        }
+        select:hover {
+            border-color: var(--green-300);
+            background: linear-gradient(135deg, #fff, var(--green-50));
+        }
+        select:focus {
+            outline: none;
+            border-color: var(--green-600);
+            box-shadow: 0 0 0 4px rgba(76,175,80,0.12);
+            background: #fff;
+        }
+        select:invalid { color: var(--soil-400); }
+
+        /* ══════════════════════════════════════
+           NOTIFICATION TYPE GRID
+           ══════════════════════════════════════ */
+        .type-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+        .type-card {
+            position: relative;
+            border: 2px solid rgba(46,125,50,0.10);
+            border-radius: var(--radius-md);
+            background: var(--white);
+            padding: 18px 10px 14px;
+            cursor: pointer;
+            transition: all var(--transition-base);
+            text-align: center;
+            user-select: none;
+            overflow: hidden;
+        }
+        .type-card::before {
+            content: '';
+            position: absolute; inset: 0;
+            background: radial-gradient(circle at 50% 0%, rgba(46,125,50,0.06), transparent 70%);
+            opacity: 0;
+            transition: opacity var(--transition-base);
+        }
+        .type-card:hover {
+            border-color: var(--green-300);
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-md), 0 0 0 1px rgba(46,125,50,0.05);
+        }
+        .type-card:hover::before { opacity: 1; }
+        .type-card.selected {
+            border-color: var(--green-700);
+            background: linear-gradient(180deg, var(--green-50), var(--white));
+            box-shadow: var(--shadow-green), inset 0 1px 0 rgba(255,255,255,0.6);
+        }
+        .type-card.selected::before { opacity: 1; background: radial-gradient(circle at 50% 0%, rgba(46,125,50,0.10), transparent 70%); }
+
+        .type-card .t-icon {
+            font-size: 28px;
+            margin-bottom: 8px;
+            transition: transform var(--transition-bounce);
+            position: relative; z-index: 1;
+        }
+        .type-card:hover .t-icon  { transform: scale(1.18) translateY(-2px); }
+        .type-card.selected .t-icon { transform: scale(1.08); }
+        .type-card .t-icon.clr-green  { color: var(--green-700); }
+        .type-card .t-icon.clr-gold   { color: var(--gold-700); }
+        .type-card .t-icon.clr-soil   { color: var(--soil-600); }
+        .type-card .t-icon.clr-sun    { color: var(--sun-600); }
+
+        .type-card .t-label {
+            font-size: 12px; font-weight: 700;
+            color: var(--soil-700);
+            letter-spacing: 0.2px;
+            position: relative; z-index: 1;
+            transition: color var(--transition-fast);
+        }
+        .type-card.selected .t-label { color: var(--green-800); }
+
+        .type-card .t-check {
+            position: absolute; top: 6px; right: 6px;
+            width: 22px; height: 22px;
+            background: var(--green-700);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            color: #fff; font-size: 10px;
+            transform: scale(0);
+            transition: transform var(--transition-bounce);
+            box-shadow: 0 2px 6px rgba(46,125,50,0.25);
+        }
+        .type-card.selected .t-check { transform: scale(1); }
+
+        /* Hidden native select */
+        .hidden-select { position:absolute; opacity:0; width:0; height:0; pointer-events:none; }
+
+        /* ══════════════════════════════════════
+           TEXTAREA
+           ══════════════════════════════════════ */
+        .textarea-wrap { position: relative; }
+        textarea {
+            width: 100%;
+            padding: 16px 18px;
+            border: 2px solid rgba(46,125,50,0.15);
+            border-radius: var(--radius-md);
+            font-size: 15px; font-family: 'DM Sans', sans-serif;
+            background: var(--white);
+            color: var(--soil-800);
+            min-height: 150px; resize: vertical;
+            transition: all var(--transition-base);
+            line-height: 1.7;
+            font-weight: 500;
+        }
+        textarea:hover {
+            border-color: var(--green-300);
+            background: linear-gradient(135deg, #fff, var(--green-50));
+        }
+        textarea:focus {
+            outline: none;
+            border-color: var(--green-600);
+            box-shadow: 0 0 0 4px rgba(76,175,80,0.12);
+            background: #fff;
+        }
+        textarea::placeholder { color: var(--soil-400); font-weight: 400; }
+
+        .char-counter {
+            position: absolute; bottom: 10px; right: 16px;
+            font-size: 12px; font-weight: 600;
+            color: var(--soil-400);
+            transition: color var(--transition-fast);
+        }
+        .char-counter.warn { color: var(--sun-600); }
+        .char-counter.danger { color: var(--error); }
+
+        /* ══════════════════════════════════════
+           BUTTONS
+           ══════════════════════════════════════ */
+        .action-row {
+            display: flex; align-items: center; gap: 16px;
+            margin-top: 36px;
+        }
+        .btn-submit {
+            position: relative;
+            background: linear-gradient(135deg, var(--green-800), var(--green-600));
+            color: #fff;
+            border: none;
+            padding: 16px 36px;
+            border-radius: var(--radius-md);
+            font-size: 16px; font-weight: 700;
+            font-family: 'DM Sans', sans-serif;
+            cursor: pointer;
+            display: flex; align-items: center; gap: 10px;
+            box-shadow: var(--shadow-green);
+            transition: all var(--transition-base);
+            overflow: hidden;
+            letter-spacing: 0.3px;
+        }
+        .btn-submit::before {
+            content: '';
+            position: absolute; top: 0; left: 0; right: 0; height: 50%;
+            background: linear-gradient(180deg, rgba(255,255,255,0.18), transparent);
+            border-radius: var(--radius-md) var(--radius-md) 0 0;
+        }
+        .btn-submit::after {
+            content: '';
+            position: absolute; inset: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0), rgba(255,255,255,0.08));
+            opacity: 0;
+            transition: opacity var(--transition-base);
+        }
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 36px rgba(46,125,50,0.28);
+        }
+        .btn-submit:hover::after { opacity: 1; }
+        .btn-submit:active {
+            transform: translateY(0);
+            box-shadow: 0 4px 12px rgba(46,125,50,0.18);
+        }
+        .btn-submit .spinner {
+            display: none;
+            width: 18px; height: 18px;
+            border: 2.5px solid rgba(255,255,255,0.3);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+        }
+        .btn-submit.loading .spinner { display: block; }
+        .btn-submit.loading .btn-text { opacity: 0.6; }
+        .btn-submit.loading .btn-icon { display: none; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .btn-reset {
+            background: transparent;
+            color: var(--soil-500);
+            border: 1.5px solid rgba(46,125,50,0.12);
+            padding: 16px 24px;
+            border-radius: var(--radius-md);
+            font-size: 15px; font-weight: 600;
+            font-family: 'DM Sans', sans-serif;
+            cursor: pointer;
+            display: flex; align-items: center; gap: 8px;
+            transition: all var(--transition-base);
+        }
+        .btn-reset:hover {
+            background: rgba(46,125,50,0.04);
+            border-color: var(--green-300);
+            color: var(--green-700);
+        }
+
+        /* ══════════════════════════════════════
+           FOOTER / BACK LINK
+           ══════════════════════════════════════ */
+        .card-footer {
+            padding: 0 40px 32px;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .back-link {
+            display: inline-flex; align-items: center; gap: 8px;
+            color: var(--green-700); text-decoration: none;
+            font-weight: 700; font-size: 14px;
+            padding: 10px 18px;
+            border-radius: var(--radius-sm);
+            transition: all var(--transition-base);
+            border: 1.5px solid transparent;
+        }
+        .back-link:hover {
+            background: var(--green-50);
+            border-color: var(--green-200);
+            color: var(--green-900);
+        }
+        .help-text {
+            font-size: 12px; color: var(--soil-400);
+            display: flex; align-items: center; gap: 5px;
+        }
+        .help-text i { color: var(--green-400); }
+
+        /* ══════════════════════════════════════
+           TOAST
+           ══════════════════════════════════════ */
+        .toast-container {
+            position: fixed; top: 24px; right: 24px;
+            z-index: 200;
+            display: flex; flex-direction: column; gap: 10px;
+        }
+        .toast {
+            background: var(--white);
+            border: 1.5px solid var(--green-200);
+            border-radius: var(--radius-md);
+            padding: 16px 20px;
+            display: flex; align-items: center; gap: 12px;
+            box-shadow: var(--shadow-lg);
+            transform: translateX(120%);
+            transition: transform var(--transition-bounce);
+            min-width: 280px;
+        }
+        .toast.show { transform: translateX(0); }
+        .toast .toast-icon {
+            width: 36px; height: 36px;
+            background: linear-gradient(135deg, var(--green-800), var(--green-500));
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            color: #fff; font-size: 16px;
+            flex-shrink: 0;
+        }
+        .toast .toast-body .toast-title {
+            font-weight: 700; font-size: 14px; color: var(--green-900);
+        }
+        .toast .toast-body .toast-msg {
+            font-size: 13px; color: var(--soil-500); margin-top: 2px;
+        }
+        .toast .toast-close {
+            background: none; border: none; color: var(--soil-400);
+            cursor: pointer; font-size: 14px; padding: 4px;
+            transition: color var(--transition-fast);
+            margin-left: auto;
+        }
+        .toast .toast-close:hover { color: var(--soil-700); }
+        .toast .progress-bar {
+            position: absolute; bottom: 0; left: 14px; right: 14px;
+            height: 3px; border-radius: 2px;
+            background: var(--green-100); overflow: hidden;
+        }
+        .toast .progress-bar .fill {
+            height: 100%; background: var(--green-600);
+            border-radius: 2px;
+            animation: progressFill 3.5s linear forwards;
+        }
+        @keyframes progressFill { 0%{width:100%} 100%{width:0%} }
+
+        /* ══════════════════════════════════════
+           FIELD VALIDATION STATES
+           ══════════════════════════════════════ */
+        .form-group.error select,
+        .form-group.error textarea {
+            border-color: var(--error);
+            box-shadow: 0 0 0 3px rgba(211,47,47,0.1);
+        }
+        .form-group .error-msg {
+            font-size: 12px; color: var(--error); font-weight: 600;
+            margin-top: 6px;
+            display: flex; align-items: center; gap: 5px;
+            opacity: 0; max-height: 0;
+            transition: all var(--transition-smooth);
+        }
+        .form-group.error .error-msg { opacity: 1; max-height: 24px; }
+
+        /* ══════════════════════════════════════
+           RESPONSIVE
+           ══════════════════════════════════════ */
+        @media (max-width: 640px) {
+            .main-wrap { margin: 16px 0 40px; padding: 0 10px; }
+            .card-header { padding: 24px 20px 0; }
+            .card-header h1 { font-size: 24px; flex-direction: column; text-align: center; gap: 10px; }
+            .card-header .subtitle { padding-left: 0; text-align: center; }
+            .divider { margin: 20px 20px 0; }
+            .card-body { padding: 24px 20px 28px; }
+            .card-footer { padding: 0 20px 24px; flex-direction: column; gap: 12px; }
+            .type-grid { grid-template-columns: repeat(2, 1fr); }
+            .action-row { flex-direction: column; }
+            .btn-submit, .btn-reset { width: 100%; justify-content: center; }
+            .header-nav { display: none; }
+        }
+
+        /* ── Accessibility ── */
+        @media (prefers-reduced-motion: reduce) {
+            *,*::before,*::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+        :focus-visible {
+            outline: 2px solid var(--green-700);
+            outline-offset: 2px;
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Send Notification to Agent</h1>
-        
-        <form method="POST">
-            <div class="form-group">
-                <label for="agent_email">Select Agent:</label>
-                <select name="agent_email" id="agent_email" required>
-                    <option value="">Choose an agent...</option>
-                    {% for agent in agents %}
-                    <option value="{{ agent.email }}">{{ agent.name }} - {{ agent.district }}</option>
-                    {% endfor %}
-                </select>
+
+    <!-- ═══ Background Layers ═══ -->
+    <div class="bg-layer bg-gradient"></div>
+    <div class="bg-layer bg-noise"></div>
+    <div class="bg-layer particle-layer" id="particleBox"></div>
+
+    <!-- Decorative Wheat -->
+    <svg class="deco-wheat left" width="50" height="170" viewBox="0 0 60 200">
+        <g fill="#b8860b" stroke="#8b6914" stroke-width="0.5">
+            <line x1="30" y1="200" x2="30" y2="40" stroke="#8b6914" stroke-width="2.5"/>
+            <ellipse cx="22" cy="50" rx="5" ry="12" transform="rotate(-25 22 50)"/>
+            <ellipse cx="38" cy="50" rx="5" ry="12" transform="rotate(25 38 50)"/>
+            <ellipse cx="18" cy="70" rx="4.5" ry="10" transform="rotate(-30 18 70)"/>
+            <ellipse cx="42" cy="70" rx="4.5" ry="10" transform="rotate(30 42 70)"/>
+            <ellipse cx="15" cy="90" rx="4" ry="9" transform="rotate(-35 15 90)"/>
+            <ellipse cx="45" cy="90" rx="4" ry="9" transform="rotate(35 45 90)"/>
+            <ellipse cx="24" cy="38" rx="3.5" ry="8" transform="rotate(-15 24 38)"/>
+            <ellipse cx="36" cy="38" rx="3.5" ry="8" transform="rotate(15 36 38)"/>
+        </g>
+    </svg>
+    <svg class="deco-wheat right" width="50" height="150" viewBox="0 0 60 200">
+        <g fill="#b8860b" stroke="#8b6914" stroke-width="0.5">
+            <line x1="30" y1="200" x2="30" y2="60" stroke="#8b6914" stroke-width="2.5"/>
+            <ellipse cx="22" cy="68" rx="5" ry="12" transform="rotate(-25 22 68)"/>
+            <ellipse cx="38" cy="68" rx="5" ry="12" transform="rotate(25 38 68)"/>
+            <ellipse cx="18" cy="88" rx="4.5" ry="10" transform="rotate(-30 18 88)"/>
+            <ellipse cx="42" cy="88" rx="4.5" ry="10" transform="rotate(30 42 88)"/>
+            <ellipse cx="15" cy="108" rx="4" ry="9" transform="rotate(-35 15 108)"/>
+            <ellipse cx="45" cy="108" rx="4" ry="9" transform="rotate(35 45 108)"/>
+        </g>
+    </svg>
+
+    <!-- ═══ Header Bar ═══ -->
+    <header class="header-bar">
+        <div class="header-brand">
+            <div class="brand-icon"><i class="fa-solid fa-seedling"></i></div>
+            AgriConnect
+        </div>
+        <nav class="header-nav">
+            <a href="/farmer">Dashboard</a>
+            <span class="sep"><i class="fa-solid fa-chevron-right" style="font-size:9px"></i></span>
+            <span class="current">Send Notification</span>
+        </nav>
+    </header>
+
+    <!-- ═══ Toast Container ═══ -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- ═══ Main Content ═══ -->
+    <main class="main-wrap">
+        <div class="card">
+            <div class="card-accent"></div>
+
+            <div class="card-header">
+                <h1>
+                    <span class="h-icon"><i class="fa-solid fa-paper-plane"></i></span>
+                    Send Notification to Agent
+                </h1>
+                <p class="subtitle">Reach your field agent for advice, support, or requests</p>
             </div>
-            
-            <div class="form-group">
-                <label for="notification_type">Notification Type:</label>
-                <select name="notification_type" id="notification_type">
-                    <option value="farmer_request">General Request</option>
-                    <option value="crop_advice">Crop Advice</option>
-                    <option value="soil_help">Soil Help</option>
-                    <option value="other">Other</option>
-                </select>
+
+            <div class="divider"></div>
+
+            <div class="card-body">
+                <form method="POST" id="notifForm" novalidate>
+
+                    <!-- Agent Select -->
+                    <div class="form-group" id="grpAgent">
+                        <div class="form-label">
+                            <i class="fa-solid fa-user-tie"></i>
+                            Select Agent
+                            <span class="required">Required</span>
+                        </div>
+                        <div class="select-wrap">
+                            <span class="sel-icon"><i class="fa-solid fa-tractor"></i></span>
+                            <span class="sel-arrow"><i class="fa-solid fa-chevron-down"></i></span>
+                            <select name="agent_email" id="agent_email" required>
+                                <option value="" disabled selected>Choose an agent...</option>
+                                {% for agent in agents %}
+                                <option value="{{ agent.email }}" data-name="{{ agent.name }}" data-district="{{ agent.district }}">{{ agent.name }} &mdash; {{ agent.district }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="error-msg"><i class="fa-solid fa-circle-exclamation"></i> Please select an agent</div>
+                    </div>
+
+                    <!-- Agent Preview -->
+                    <div class="agent-preview" id="agentPreview">
+                        <div class="agent-avatar" id="agentAvatar">A</div>
+                        <div class="agent-meta">
+                            <div class="agent-name" id="agentName">Agent Name</div>
+                            <div class="agent-district" id="agentDistrict"><i class="fa-solid fa-location-dot"></i> District</div>
+                        </div>
+                        <div class="agent-status"><div class="dot"></div> Available</div>
+                    </div>
+
+                    <!-- Notification Type -->
+                    <div class="form-group" id="grpType">
+                        <div class="form-label">
+                            <i class="fa-solid fa-bell"></i>
+                            Notification Type
+                        </div>
+                        <div class="type-grid" id="typeGrid">
+                            <div class="type-card" data-value="farmer_request" tabindex="0" role="radio" aria-checked="false" aria-label="General Request">
+                                <div class="t-icon clr-green"><i class="fa-solid fa-hand-holding-seedling"></i></div>
+                                <div class="t-label">General Request</div>
+                                <div class="t-check"><i class="fa-solid fa-check"></i></div>
+                            </div>
+                            <div class="type-card" data-value="crop_advice" tabindex="0" role="radio" aria-checked="false" aria-label="Crop Advice">
+                                <div class="t-icon clr-gold"><i class="fa-solid fa-wheat-awn"></i></div>
+                                <div class="t-label">Crop Advice</div>
+                                <div class="t-check"><i class="fa-solid fa-check"></i></div>
+                            </div>
+                            <div class="type-card" data-value="soil_help" tabindex="0" role="radio" aria-checked="false" aria-label="Soil Help">
+                                <div class="t-icon clr-soil"><i class="fa-solid fa-mountain-sun"></i></div>
+                                <div class="t-label">Soil Help</div>
+                                <div class="t-check"><i class="fa-solid fa-check"></i></div>
+                            </div>
+                            <div class="type-card" data-value="other" tabindex="0" role="radio" aria-checked="false" aria-label="Other">
+                                <div class="t-icon clr-sun"><i class="fa-solid fa-comments"></i></div>
+                                <div class="t-label">Other</div>
+                                <div class="t-check"><i class="fa-solid fa-check"></i></div>
+                            </div>
+                        </div>
+                        <select name="notification_type" id="notification_type" class="hidden-select" aria-hidden="true" tabindex="-1">
+                            <option value="farmer_request">General Request</option>
+                            <option value="crop_advice">Crop Advice</option>
+                            <option value="soil_help">Soil Help</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+
+                    <!-- Message -->
+                    <div class="form-group" id="grpMsg">
+                        <div class="form-label">
+                            <i class="fa-solid fa-envelope-open-text"></i>
+                            Your Message
+                            <span class="required">Required</span>
+                        </div>
+                        <div class="textarea-wrap">
+                            <textarea name="message" id="message" placeholder="Describe your request, crop issue, or question for the agent..." required maxlength="500"></textarea>
+                            <div class="char-counter" id="charCounter">0 / 500</div>
+                        </div>
+                        <div class="error-msg"><i class="fa-solid fa-circle-exclamation"></i> Please enter a message</div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="action-row">
+                        <button type="submit" class="btn-submit" id="submitBtn">
+                            <span class="spinner"></span>
+                            <i class="fa-solid fa-paper-plane btn-icon"></i>
+                            <span class="btn-text">Send Notification</span>
+                        </button>
+                        <button type="reset" class="btn-reset" id="resetBtn">
+                            <i class="fa-solid fa-rotate-left"></i>
+                            Clear Form
+                        </button>
+                    </div>
+                </form>
             </div>
-            
-            <div class="form-group">
-                <label for="message">Message:</label>
-                <textarea name="message" id="message" placeholder="Enter your message to the agent..." required></textarea>
+
+            <div class="card-footer">
+                <a href="/farmer" class="back-link">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    Back to Dashboard
+                </a>
+                <div class="help-text">
+                    <i class="fa-solid fa-circle-info"></i>
+                    Notifications are delivered instantly
+                </div>
             </div>
-            
-            <button type="submit" class="btn">Send Notification</button>
-        </form>
-        
-        <a href="/farmer" class="back-btn">← Back to Farmer Dashboard</a>
-    </div>
+        </div>
+    </main>
+
+    <script>
+        /* ── Floating Particles ── */
+        (() => {
+            const box = document.getElementById('particleBox');
+            const kinds = ['seed', 'pollen', 'leaf'];
+            for (let i = 0; i < 20; i++) {
+                const el = document.createElement('div');
+                const k = kinds[Math.floor(Math.random() * kinds.length)];
+                el.className = `particle ${k}`;
+                el.style.left = (Math.random() * 100) + 'vw';
+                el.style.animationDuration = (10 + Math.random() * 16) + 's';
+                el.style.animationDelay = (-Math.random() * 22) + 's';
+                box.appendChild(el);
+            }
+        })();
+
+        /* ── Agent Select → Preview ── */
+        const agentSel  = document.getElementById('agent_email');
+        const preview   = document.getElementById('agentPreview');
+        const avatarEl  = document.getElementById('agentAvatar');
+        const nameEl    = document.getElementById('agentName');
+        const distEl    = document.getElementById('agentDistrict');
+
+        agentSel.addEventListener('change', function() {
+            const opt = this.options[this.selectedIndex];
+            if (opt && opt.value) {
+                const name = (opt.dataset.name || opt.textContent.split(' — ')[0]).trim();
+                const dist = (opt.dataset.district || opt.textContent.split(' — ')[1]).trim();
+                avatarEl.textContent = name.charAt(0).toUpperCase();
+                nameEl.textContent = name;
+                distEl.innerHTML = `<i class="fa-solid fa-location-dot"></i> ${dist}`;
+                preview.classList.add('visible');
+                document.getElementById('grpAgent').classList.remove('error');
+            } else {
+                preview.classList.remove('visible');
+            }
+        });
+
+        /* ── Type Card Selection ── */
+        const cards = document.querySelectorAll('.type-card');
+        const hiddenSel = document.getElementById('notification_type');
+
+        function selectCard(card) {
+            cards.forEach(c => {
+                c.classList.remove('selected');
+                c.setAttribute('aria-checked', 'false');
+            });
+            card.classList.add('selected');
+            card.setAttribute('aria-checked', 'true');
+            hiddenSel.value = card.dataset.value;
+        }
+
+        cards.forEach(card => {
+            card.addEventListener('click', () => selectCard(card));
+            card.addEventListener('keydown', e => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    selectCard(card);
+                }
+            });
+        });
+        // Default
+        selectCard(cards[0]);
+
+        /* ── Character Counter ── */
+        const msgArea = document.getElementById('message');
+        const counter = document.getElementById('charCounter');
+
+        msgArea.addEventListener('input', function() {
+            const len = this.value.length;
+            counter.textContent = `${len} / 500`;
+            counter.classList.remove('warn', 'danger');
+            if (len > 400) counter.classList.add('warn');
+            if (len > 470) counter.classList.add('danger');
+            if (len > 0) document.getElementById('grpMsg').classList.remove('error');
+        });
+
+        /* ── Toast System ── */
+        const toastBox = document.getElementById('toastContainer');
+
+        function showToast(title, msg, duration = 3500) {
+            const t = document.createElement('div');
+            t.className = 'toast';
+            t.innerHTML = `
+                <div class="toast-icon"><i class="fa-solid fa-circle-check"></i></div>
+                <div class="toast-body">
+                    <div class="toast-title">${title}</div>
+                    <div class="toast-msg">${msg}</div>
+                </div>
+                <button class="toast-close" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
+                <div class="progress-bar"><div class="fill" style="animation-duration:${duration}ms"></div></div>
+            `;
+            toastBox.appendChild(t);
+            // Trigger animation
+            requestAnimationFrame(() => requestAnimationFrame(() => t.classList.add('show')));
+            // Close button
+            t.querySelector('.toast-close').addEventListener('click', () => removeToast(t));
+            // Auto remove
+            setTimeout(() => removeToast(t), duration);
+        }
+
+        function removeToast(t) {
+            t.classList.remove('show');
+            setTimeout(() => t.remove(), 500);
+        }
+
+        /* ── Form Validation & Submit ── */
+        const form = document.getElementById('notifForm');
+        const submitBtn = document.getElementById('submitBtn');
+
+        form.addEventListener('submit', function(e) {
+            let valid = true;
+
+            // Validate agent
+            if (!agentSel.value) {
+                document.getElementById('grpAgent').classList.add('error');
+                valid = false;
+            }
+
+            // Validate message
+            if (!msgArea.value.trim()) {
+                document.getElementById('grpMsg').classList.add('error');
+                valid = false;
+            }
+
+            if (!valid) {
+                e.preventDefault();
+                return;
+            }
+
+            // Simulate loading state (remove e.preventDefault() for real POST)
+            e.preventDefault();
+            submitBtn.classList.add('loading');
+            submitBtn.disabled = true;
+
+            setTimeout(() => {
+                submitBtn.classList.remove('loading');
+                submitBtn.disabled = false;
+                showToast('Notification Sent', `Your message has been delivered to the agent successfully.`, 4000);
+                // Optionally reset form
+                // form.reset();
+                // preview.classList.remove('visible');
+                // selectCard(cards[0]);
+                // counter.textContent = '0 / 500';
+            }, 1800);
+        });
+
+        /* ── Reset Button ── */
+        document.getElementById('resetBtn').addEventListener('click', () => {
+            preview.classList.remove('visible');
+            document.querySelectorAll('.form-group').forEach(g => g.classList.remove('error'));
+            counter.textContent = '0 / 500';
+            counter.classList.remove('warn', 'danger');
+            selectCard(cards[0]);
+        });
+
+        /* ── Clear validation on focus ── */
+        agentSel.addEventListener('focus', () => document.getElementById('grpAgent').classList.remove('error'));
+        msgArea.addEventListener('focus', () => document.getElementById('grpMsg').classList.remove('error'));
+    </script>
 </body>
-</html> 
+</html>
