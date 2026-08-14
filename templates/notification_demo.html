@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Soil Analysis Notification Demo</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #f4f8fb;
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: #fff;
+            border-radius: 14px;
+            box-shadow: 0 2px 16px rgba(42,122,226,0.10);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 2.2em;
+            font-weight: 600;
+        }
+        .content {
+            padding: 30px;
+        }
+        .demo-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            background: #f8fafc;
+        }
+        .demo-section h2 {
+            color: #10b981;
+            margin-top: 0;
+        }
+        .request-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .request-card {
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .request-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+        .request-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #fbbf24, #f59e0b);
+        }
+        .request-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .request-title {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: #1f2937;
+        }
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 600;
+            text-transform: uppercase;
+            background: #fef3c7;
+            color: #92400e;
+        }
+        .request-details {
+            margin-bottom: 20px;
+        }
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .detail-item {
+            background: #f8fafc;
+            padding: 12px;
+            border-radius: 8px;
+            border-left: 3px solid #10b981;
+        }
+        .detail-item strong {
+            color: #374151;
+            display: block;
+            margin-bottom: 4px;
+            font-size: 0.9em;
+        }
+        .detail-item span {
+            color: #6b7280;
+            font-size: 0.9em;
+        }
+        .request-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .btn:hover {
+            transform: translateY(-1px);
+        }
+        .btn-primary {
+            background: #10b981;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #059669;
+        }
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+        }
+        .btn-secondary:hover {
+            background: #4b5563;
+        }
+        .btn-warning {
+            background: #f59e0b;
+            color: white;
+        }
+        .btn-warning:hover {
+            background: #d97706;
+        }
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+        .urgent-badge {
+            background: #ef4444;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.7em;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        .notification-card {
+            border: 2px solid #fbbf24;
+            background: #fffbeb;
+        }
+        .notification-card::before {
+            background: linear-gradient(90deg, #fbbf24, #f59e0b);
+        }
+        .priority-high {
+            border-left-color: #ef4444;
+        }
+        .instructions {
+            background: #e0f2fe;
+            border: 1px solid #81d4fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .instructions h3 {
+            color: #0277bd;
+            margin-top: 0;
+        }
+        .instructions ol {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+        .instructions li {
+            margin: 8px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌱 Soil Analysis Notification System</h1>
+            <p>Real-time notifications for soil analysis requests from farmers</p>
+        </div>
+        
+        <div class="content">
+            <div class="demo-section">
+                <h2>🚨 URGENT: NEW SOIL ANALYSIS REQUEST</h2>
+                <p>This is how the notification card appears when a farmer submits a soil analysis request:</p>
+                
+                <div class="request-grid">
+                    <div class="request-card notification-card priority-high">
+                        <div class="request-header">
+                            <div class="request-title">
+                                🚨 URGENT: NEW SOIL ANALYSIS REQUEST
+                                <span class="urgent-badge">URGENT</span>
+                            </div>
+                            <span class="status-badge">New</span>
+                        </div>
+                        <div class="request-details">
+                            <div class="detail-grid">
+                                <div class="detail-item">
+                                    <strong>👨‍🌾 Farmer Name</strong>
+                                    <span>shashi kumar</span>
+                                </div>
+                                <div class="detail-item">
+                                    <strong>🏘️ District</strong>
+                                    <span>Adilabad</span>
+                                </div>
+                                <div class="detail-item">
+                                    <strong>📱 Phone Number</strong>
+                                    <span>6301691012</span>
+                                </div>
+                                <div class="detail-item">
+                                    <strong>📍 Address</strong>
+                                    <span>ndbdfsnmbn</span>
+                                </div>
+                                <div class="detail-item">
+                                    <strong>🌾 Intended Crop</strong>
+                                    <span>Not specified</span>
+                                </div>
+                                <div class="detail-item">
+                                    <strong>⏰ Received</strong>
+                                    <span>2024-01-15 14:30</span>
+                                </div>
+                                <div class="detail-item">
+                                    <strong>🚨 Priority</strong>
+                                    <span>High - Immediate Action Required</span>
+                                </div>
+                                <div class="detail-item">
+                                    <strong>📋 Message</strong>
+                                    <span>Please contact the farmer immediately to schedule soil sampling.</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="request-actions">
+                            <button class="btn btn-primary" onclick="alert('✅ Request accepted! Farmer will be notified.')">
+                                ✅ Accept Request
+                            </button>
+                            <button class="btn btn-warning" onclick="alert('📞 Contacting farmer at 6301691012')">
+                                📞 Contact Farmer
+                            </button>
+                            <button class="btn btn-secondary" onclick="alert('📅 Opening visit scheduling form...')">
+                                📅 Schedule Visit
+                            </button>
+                            <button class="btn btn-danger" onclick="alert('✓ Notification marked as read')">
+                                ✓ Mark as Read
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="instructions">
+                <h3>📋 How to Test the Notification System</h3>
+                <ol>
+                    <li><strong>Start the Flask Application:</strong> Run <code>python convert_crops.py</code> in your terminal</li>
+                    <li><strong>Login as Soil Agent:</strong> Use credentials for a soil agent account (e.g., ramesh.adilabad@agri.com)</li>
+                    <li><strong>View Dashboard:</strong> Go to the soil agent dashboard at <code>/soilagent</code></li>
+                    <li><strong>See Notification:</strong> The notification card for "shashi kumar" will appear with all action buttons</li>
+                    <li><strong>Test Actions:</strong> Click the buttons to test different responses</li>
+                </ol>
+            </div>
+
+            <div class="demo-section">
+                <h2>🔧 Available Actions</h2>
+                <div class="detail-grid">
+                    <div class="detail-item">
+                        <strong>✅ Accept Request</strong>
+                        <span>Marks the request as accepted and notifies the farmer</span>
+                    </div>
+                    <div class="detail-item">
+                        <strong>📞 Contact Farmer</strong>
+                        <span>Shows farmer contact details for immediate communication</span>
+                    </div>
+                    <div class="detail-item">
+                        <strong>📅 Schedule Visit</strong>
+                        <span>Opens a modal to schedule soil sampling visit</span>
+                    </div>
+                    <div class="detail-item">
+                        <strong>✓ Mark as Read</strong>
+                        <span>Removes the notification from the urgent list</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="demo-section">
+                <h2>📊 Request Status Flow</h2>
+                <div class="detail-grid">
+                    <div class="detail-item">
+                        <strong>🆕 Pending</strong>
+                        <span>Initial status when farmer submits request</span>
+                    </div>
+                    <div class="detail-item">
+                        <strong>🔄 Processing</strong>
+                        <span>Agent starts working on the soil analysis</span>
+                    </div>
+                    <div class="detail-item">
+                        <strong>📋 Fill Report</strong>
+                        <span>Agent completes soil analysis and recommendations</span>
+                    </div>
+                    <div class="detail-item">
+                        <strong>✅ Completed</strong>
+                        <span>Final status when report is delivered to farmer</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="demo-section">
+                <h2>🌐 Access the System</h2>
+                <p>The notification system is now live and ready to use:</p>
+                <div class="request-actions">
+                    <a href="/" class="btn btn-primary">🏠 Go to Homepage</a>
+                    <a href="/login" class="btn btn-secondary">🔐 Login</a>
+                    <a href="/soilagent" class="btn btn-warning">🌱 Agent Dashboard</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Demo functionality
+        function showNotification() {
+            alert('🔔 This is how the notification system works!\n\n1. Farmer submits soil analysis request\n2. Agent receives urgent notification\n3. Agent can accept, contact, schedule, or mark as read\n4. System tracks all interactions');
+        }
+
+        // Show welcome message
+        window.addEventListener('load', function() {
+            setTimeout(() => {
+                showNotification();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

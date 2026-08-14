@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<head></head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Soil Report Form - AgriMarket</title>
+<style>
+    body {
+        font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
+        background: linear-gradient(135deg, #f8fafc 0%, #e0e7ff 100%);
+        margin: 0;
+        padding: 0;
+        line-height: 1.7;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .form-container {
+        background: #fff;
+        padding: 40px;
+        border-radius: 16px;
+        width: 95%;
+        max-width: 500px;
+        box-shadow: 0 8px 32px rgba(99, 102, 241, 0.13);
+        transform: scale(0.85);
+        transition: transform 0.3s;
+    }
+    .form-container.active { transform: scale(1); }
+    .form-header { text-align: center; margin-bottom: 30px; }
+    .form-header h1 { color: #2563eb; font-size: 1.8em; margin-bottom: 10px; }
+    .form-header p { color: #64748b; font-size: 1em; }
+    .form-group { margin-bottom: 20px; }
+    .form-group label { display: block; margin-bottom: 8px; color: #374151; font-weight: 600; font-size: 0.95em; }
+    .form-group select { width: 100%; padding: 12px; border: 1px solid #c7d2fe; border-radius: 8px; font-size: 1em; transition: border-color 0.3s, box-shadow 0.3s; box-sizing: border-box; }
+    .form-group select:focus { outline: none; border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1); }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+    .form-buttons { display: flex; gap: 15px; margin-top: 30px; }
+    .btn { flex: 1; padding: 14px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 1em; transition: background 0.3s, transform 0.2s; }
+    .btn:hover { transform: translateY(-2px); }
+    .btn-primary { background: #6366f1; color: #fff; }
+    .btn-primary:hover { background: #10b981; }
+    .btn-secondary { background: #f59e42; color: #fff; }
+    .btn-secondary:hover { background: #fbbf24; }
+    .note { background: #fef3c7; border: 1px solid #f59e0b; border-radius: 8px; padding: 15px; margin: 20px 0; color: #92400e; font-size: 0.9em; }
+    .note em { font-style: normal; font-weight: 600; }
+    .crop-recommendations { display: none; margin-top: 20px; }
+    .crop-recommendations.active { display: block; }
+    .crop-details { display: none; margin-top: 20px; }
+    .crop-details h2 { color: #2563eb; margin-bottom: 20px; }
+    .crop-details pre { background: #f8f9fa; border-radius: 8px; padding: 20px; margin: 15px 0; white-space: pre-wrap; font-family: 'Courier New', monospace; font-size: 0.9em; line-height: 1.6; }
+    .crop-details h3 { color: #374151; margin-top: 25px; margin-bottom: 15px; }
+    .crop-details p { margin-bottom: 15px; line-height: 1.6; }
+    .crop-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 20px 0; }
+    .crop-card { background: #fff; border: 2px solid #e0e7ff; border-radius: 12px; padding: 15px; text-align: center; cursor: pointer; transition: all 0.3s ease; }
+    .crop-card:hover { border-color: #6366f1; transform: translateY(-3px); box-shadow: 0 8px 20px rgba(99, 102, 241, 0.15); }
+    .crop-card.selected { border-color: #10b981; background: #f0fdf4; }
+    .crop-card h4 { color: #2563eb; margin: 0 0 10px 0; }
+    .crop-card p { color: #64748b; font-size: 0.9em; margin: 0; }
+    .crop-suitability { font-size: 0.8em; color: #059669; font-weight: 600; margin-top: 8px; }
+    .back-button { background: #64748b; color: #fff; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: 600; margin-top: 15px; }
+    .back-button:hover { background: #475569; }
+    @media (max-width: 600px) { .form-container { padding: 30px 20px; margin: 20px; } .form-row { grid-template-columns: 1fr; } .form-buttons { flex-direction: column; } .crop-grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<div class="form-container active">
+    <div class="form-header">
+        <h1>🌱 Soil Analysis Report</h1>
+        <p>Enter your soil test results to get personalized recommendations</p>
+    </div>
+    <form id="soilReportForm" method="POST">
+        <div class="form-group">
+            <label for="soilType">Soil Type</label>
+            <select id="soilType" required>
+                <option value="">Select Soil Type</option>
+                <option value="loamy">Loamy</option>
+                <option value="clay">Clay</option>
+                <option value="sandy">Sandy</option>
+                <option value="silt">Silt</option>
+                <option value="clay-loam">Clay-Loam</option>
+                <option value="sandy-loam">Sandy-Loam</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="soilpH">Soil pH Level</label>
+            <select id="soilpH" required>
+                <option value="">Select pH Level</option>
+                <option value="low">Low (0-6)</option>
+                <option value="medium">Medium (6-7.5)</option>
+                <option value="high">High (7.5-14)</option>
+            </select>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label for="nitrogen">Nitrogen (N)</label>
+                <select id="nitrogen" required>
+                    <option value="">Select Nitrogen Level</option>
+                    <option value="low">Low</option>
+                    <option value="medium">Medium</option>
+                    <option value="high">High</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="phosphorus">Phosphorus (P)</label>
+                <select id="phosphorus" required>
+                    <option value="">Select Phosphorus Level</option>
+                    <option value="low">Low</option>
+                    <option value="medium">Medium</option>
+                    <option value="high">High</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="potassium">Potassium (K)</label>
+            <select id="potassium" required>
+                <option value="">Select Potassium Level</option>
+                <option value="low">Low</option>
+                <option value="medium">Medium</option>
+                <option value="high">High</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="ec">Electrical Conductivity (EC)</label>
+            <select id="ec" required>
+                <option value="">Select EC Level</option>
+                <option value="low">Low</option>
+                <option value="medium">Medium</option>
+                <option value="high">High</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="organicCarbon">Organic Carbon (%)</label>
+            <select id="organicCarbon" required>
+                <option value="">Select Organic Carbon Level</option>
+                <option value="low">Low</option>
+                <option value="medium">Medium</option>
+                <option value="high">High</option>
+            </select>
+        </div>
+        <div class="note">
+            <em>Note:</em> Select the levels from your soil test report. If you don't have test results, consider getting your soil tested at a certified laboratory for accurate recommendations.
+        </div>
+        <div class="form-buttons">
+            <button type="submit" class="btn btn-primary">Generate Report</button>
+            <button type="button" class="btn btn-secondary" onclick="resetForm()">Reset Form</button>
+        </div>
+    </form>
+    <div class="crop-recommendations" id="cropRecommendations">
+        <h2>🌾 Recommended Crops for Your Soil</h2>
+        <p>Based on your soil analysis, here are the best crops for your field:</p>
+        <div class="crop-grid" id="cropGrid"></div>
+        <div class="form-buttons">
+            <button type="button" class="back-button" onclick="backToForm()">Back to Soil Form</button>
+        </div>
+    </div>
+    <div class="crop-details" id="cropDetails" style="display: none;">
+        <h2>🌱 Crop Growing Guide</h2>
+        <div id="cropDetailsContent"></div>
+        <div class="form-buttons">
+            <button type="button" class="back-button" onclick="backToRecommendations()">Back to Recommendations</button>
+        </div>
+    </div>
+</div>
+<script>
+    // Full crop database with all crops and their requirements
+    const cropDatabase = {
+        rice: { name: "Rice", description: "Requires standing water, best for clayey or loamy soil.", soilType: ["clayey", "loamy"], pH: ["medium"], nitrogen: ["medium", "high"], phosphorus: ["medium"], potassium: ["medium", "high"], ec: ["low", "medium"], organicCarbon: ["medium", "high"], water: "High (1000-1500 mm per season, requires standing water)"},
+        wheat: { name: "Wheat", description: "Medium water needs, clayey or loamy soil.", soilType: ["clayey", "loamy"], pH: ["medium"], nitrogen: ["medium"], phosphorus: ["medium"], potassium: ["medium"], ec: ["low"], organicCarbon: ["medium"], water: "Medium (500-800 mm per season)" },
+        maize: { name: "Maize", description: "Loamy soil, medium to high water needs.", soilType: ["loamy"], pH: ["medium"], nitrogen: ["medium"], phosphorus: ["medium", "high"], potassium: ["medium"], ec: ["low", "medium"], organicCarbon: ["medium", "high"], water: "Medium to high (500-1000 mm per season)" },
+        sorghum: { name: "Sorghum (Jowar)", description: "Drought-tolerant, sandy or clayey soil.", soilType: ["sandy", "clayey"], pH: ["medium", "high"], nitrogen: ["low", "medium"], phosphorus: ["low", "medium"], potassium: ["low", "medium"], ec: ["medium", "high"], organicCarbon: ["low"], water: "Low to medium (400-600 mm per season, drought-tolerant)" },
+        pearlmillet: { name: "Pearl Millet (Bajra)", description: "Highly drought-tolerant, sandy or loamy soil.", soilType: ["sandy", "loamy"], pH: ["medium", "high"], nitrogen: ["low", "medium"], phosphorus: ["low"], potassium: ["low", "medium"], ec: ["medium", "high"], organicCarbon: ["low"], water: "Low (300-500 mm per season, highly drought-tolerant)" },
+        fingermillet: { name: "Finger Millet (Ragi)", description: "Loamy or sandy soil, drought-tolerant.", soilType: ["loamy", "sandy"], pH: ["medium"], nitrogen: ["low"], phosphorus: ["low"], potassium: ["low", "medium"], ec: ["low", "medium"], organicCarbon: ["low"], water: "Low to medium (350-550 mm per season, drought-tolerant)" },
+        redgram: { name: "Red Gram (Pigeonpea)", description: "Loamy or clayey soil, drought-tolerant.", soilType: ["loamy", "clayey"], pH: ["medium"], nitrogen: ["low", "medium"], phosphorus: ["medium"], potassium: ["medium"], ec: ["low", "medium"], organicCarbon: ["low", "medium"], water: "Low to medium (400-600 mm per season, drought-tolerant)" },
+        greengram: { name: "Green Gram (Moong)", description: "Sandy or loamy soil, low to medium water.", soilType: ["sandy", "loamy"], pH: ["medium"], nitrogen: ["low"], phosphorus: ["low", "medium"], potassium: ["medium"], ec: ["low"], organicCarbon: ["low", "medium"], water: "Low to medium (350-500 mm per season)" },
+        blackgram: { name: "Black Gram (Urad)", description: "Loamy or clayey soil, low to medium water.", soilType: ["loamy", "clayey"], pH: ["medium"], nitrogen: ["low"], phosphorus: ["medium"], potassium: ["medium"], ec: ["low", "medium"], organicCarbon: ["low", "medium"], water: "Low to medium (350-500 mm per season)" },
+        lentil: { name: "Lentil", description: "Loamy soil, low to medium water.", soilType: ["loamy"], pH: ["medium"], nitrogen: ["low"], phosphorus: ["medium"], potassium: ["medium"], ec: ["low"], organicCarbon: ["low", "medium"], water: "Low to medium (300-500 mm per season)" },
+        groundnut: { name: "Groundnut", description: "Sandy or loamy soil, medium water needs.", soilType: ["sandy", "loamy"], pH: ["medium"], nitrogen: ["low", "medium"], phosphorus: ["medium"], potassium: ["medium"], ec: ["low"], organicCarbon: ["low", "medium"], water: "Medium (500-700 mm per season)" },
+        sesame: { name: "Sesame", description: "Sandy or loamy soil, drought-tolerant.", soilType: ["sandy", "loamy"], pH: ["medium"], nitrogen: ["low"], phosphorus: ["medium"], potassium: ["medium"], ec: ["low", "medium"], organicCarbon: ["low"], water: "Low (300-500 mm per season, drought-tolerant)" },
+        soybean: { name: "Soybean", description: "Loamy or silty soil, medium water needs.", soilType: ["loamy", "silty"], pH: ["medium"], nitrogen: ["medium"], phosphorus: ["medium"], potassium: ["medium"], ec: ["low"], organicCarbon: ["medium"], water: "Medium (450-700 mm per season)" },
+        mustard: { name: "Mustard", description: "Loamy or clayey soil, medium water needs.", soilType: ["loamy", "clayey"], pH: ["medium", "high"], nitrogen: ["medium"], phosphorus: ["medium"], potassium: ["medium"], ec: ["low"], organicCarbon: ["low", "medium"], water: "Medium (400-600 mm per season)" },
+        sunflower: { name: "Sunflower", description: "Loamy or clayey soil, medium water needs.", soilType: ["loamy", "clayey"], pH: ["medium", "high"], nitrogen: ["low", "medium"], phosphorus: ["high"], potassium: ["medium"], ec: ["medium"], organicCarbon: ["medium"], water: "Medium (500-700 mm per season)" },
+        cotton: { name: "Cotton", description: "Sandy or clayey soil, medium to high water needs.", soilType: ["sandy", "clayey"], pH: ["medium"], nitrogen: ["medium"], phosphorus: ["high"], potassium: ["high"], ec: ["medium", "high"], organicCarbon: ["low", "medium"], water: "Medium to high (600-900 mm per season)" },
+        sugarcane: { name: "Sugarcane", description: "Clayey or loamy soil, high water needs.", soilType: ["clayey", "loamy"], pH: ["medium"], nitrogen: ["high"], phosphorus: ["medium"], potassium: ["high"], ec: ["low"], organicCarbon: ["medium", "high"], water: "High (1500-2500 mm per season)" },
+        jute: { name: "Jute", description: "Clayey or alluvial soil, high water needs.", soilType: ["clayey", "alluvial"], pH: ["medium"], nitrogen: ["medium"], phosphorus: ["medium"], potassium: ["medium"], ec: ["low"], organicCarbon: ["high"], water: "High (1000-1500 mm per season)" },
+        tea: { name: "Tea", description: "Loamy and acidic soil, high water needs.", soilType: ["loamy", "acidic"], pH: ["low"], nitrogen: ["medium"], phosphorus: ["medium"], potassium: ["medium"], ec: ["low"], organicCarbon: ["high"], water: "High (1000-1500 mm per season, prefers consistent moisture)" },
+        coffee: { name: "Coffee", description: "Well-drained loamy soil, medium to high water needs.", soilType: ["loamy"], pH: ["medium"], nitrogen: ["medium"], phosphorus: ["medium"], potassium: ["medium"], ec: ["low"], organicCarbon: ["high"], water: "Medium to high (800-1200 mm per season)" },
+        banana: { name: "Banana", description: "Loamy or silty soil, high water needs.", soilType: ["loamy", "silty"], pH: ["medium"], nitrogen: ["high"], phosphorus: ["medium"], potassium: ["high"], ec: ["low"], organicCarbon: ["high"], water: "High (1200-2000 mm per season)" },
+        tomato: { name: "Tomato", description: "Loamy soil, medium water needs.", soilType: ["loamy"], pH: ["medium"], nitrogen: ["medium"], phosphorus: ["medium", "high"], potassium: ["medium", "high"], ec: ["low"], organicCarbon: ["high"], water: "Medium (600-800 mm per season)" },
+        onion: { name: "Onion", description: "Sandy loam or loamy soil, medium water needs.", soilType: ["sandy loam", "loamy"], pH: ["medium"], nitrogen: ["medium"], phosphorus: ["high"], potassium: ["medium"], ec: ["low", "medium"], organicCarbon: ["medium"], water: "Medium (500-700 mm per season)" },
+        apple: { name: "Apple", description: "Well-drained loamy soil, cool climate, medium water needs.", soilType: ["loamy"], pH: ["medium"], nitrogen: ["medium"], phosphorus: ["medium"], potassium: ["medium"], ec: ["low"], organicCarbon: ["medium"], water: "Medium (600-800 mm per season)" },
+        mango: { name: "Mango", description: "Well-drained loamy soil, warm climate, medium water needs.", soilType: ["loamy"], pH: ["medium"], nitrogen: ["medium"], phosphorus: ["medium"], potassium: ["medium"], ec: ["low"], organicCarbon: ["medium"], water: "Medium (700-900 mm per season)" },
+        grapes: { name: "Grapes", description: "Sandy loam or loamy soil, medium water needs.", soilType: ["sandy loam", "loamy"], pH: ["medium"], nitrogen: ["medium"], phosphorus: ["medium"], potassium: ["medium"], ec: ["low"], organicCarbon: ["medium"], water: "Medium (600-800 mm per season)" },
+        guava: { name: "Guava", description: "Well-drained loamy soil, medium water needs.", soilType: ["loamy"], pH: ["medium"], nitrogen: ["medium"], phosphorus: ["medium"], potassium: ["medium"], ec: ["low"], organicCarbon: ["medium"], water: "Medium (600-800 mm per season)" },
+        papaya: { name: "Papaya", description: "Well-drained loamy soil, medium water needs.", soilType: ["loamy"], pH: ["medium"], nitrogen: ["medium"], phosphorus: ["medium"], potassium: ["medium"], ec: ["low"], organicCarbon: ["medium"], water: "Medium (600-800 mm per season)" },
+        pineapple: { name: "Pineapple", description: "Sandy loam soil, medium water needs.", soilType: ["sandy loam"], pH: ["medium"], nitrogen: ["medium"], phosphorus: ["medium"], potassium: ["medium"], ec: ["low"], organicCarbon: ["medium"], water: "Medium (600-800 mm per season)" },
+        pomegranate: { name: "Pomegranate", description: "Well-drained loamy soil, low to medium water needs.", soilType: ["loamy"], pH: ["medium"], nitrogen: ["medium"], phosphorus: ["medium"], potassium: ["medium"], ec: ["low"], organicCarbon: ["medium"], water: "Low to medium (400-700 mm per season)" },
+        lemon: { name: "Lemon", description: "Well-drained loamy soil, medium water needs.", soilType: ["loamy"], pH: ["medium"], nitrogen: ["medium"], phosphorus: ["medium"], potassium: ["medium"], ec: ["low"], organicCarbon: ["medium"], water: "Medium (600-800 mm per season)" },
+        orange: { name: "Orange", description: "Well-drained loamy soil, medium water needs.", soilType: ["loamy"], pH: ["medium"], nitrogen: ["medium"], phosphorus: ["medium"], potassium: ["medium"], ec: ["low"], organicCarbon: ["medium"], water: "Medium (600-800 mm per season)" },
+        coconut: { name: "Coconut", description: "Sandy loam or alluvial soil, high water needs.", soilType: ["sandy loam", "alluvial"], pH: ["medium"], nitrogen: ["medium"], phosphorus: ["medium"], potassium: ["medium"], ec: ["low"], organicCarbon: ["medium"], water: "High (1500-2500 mm per season)" },
+        arecanut: { name: "Arecanut", description: "Well-drained loamy soil, high water needs.", soilType: ["loamy"], pH: ["medium"], nitrogen: ["medium"], phosphorus: ["medium"], potassium: ["medium"], ec: ["low"], organicCarbon: ["medium"], water: "High (1500-2500 mm per season)" },
+        cashew: { name: "Cashew", description: "Laterite or sandy loam soil, medium water needs.", soilType: ["laterite", "sandy loam"], pH: ["medium"], nitrogen: ["medium"], phosphorus: ["medium"], potassium: ["medium"], ec: ["low"], organicCarbon: ["medium"], water: "Medium (700-900 mm per season)" },
+        cocoa: { name: "Cocoa", description: "Well-drained loamy soil, high water needs.", soilType: ["loamy"], pH: ["medium"], nitrogen: ["medium"], phosphorus: ["medium"], potassium: ["medium"], ec: ["low"], organicCarbon: ["medium"], water: "High (1500-2500 mm per season)" },
+        rubber: { name: "Rubber", description: "Well-drained loamy soil, high water needs.", soilType: ["loamy"], pH: ["medium"], nitrogen: ["medium"], phosphorus: ["medium"], potassium: ["medium"], ec: ["low"], organicCarbon: ["medium"], water: "High (2000-3000 mm per season)" },
+        cardamom: { name: "Cardamom", description: "Loamy soil, high organic matter, high water needs.", soilType: ["loamy"], pH: ["medium"], nitrogen: ["medium"], phosphorus: ["medium"], potassium: ["medium"], ec: ["low"], organicCarbon: ["high"], water: "High (1500-2500 mm per season)" },
+        blackpepper: { name: "Black Pepper", description: "Loamy soil, high organic matter, high water needs.", soilType: ["loamy"], pH: ["medium"], nitrogen: ["medium"], phosphorus: ["medium"], potassium: ["medium"], ec: ["low"], organicCarbon: ["high"], water: "High (1500-2500 mm per season)" },
+        turmeric: { name: "Turmeric", description: "Loamy soil, high organic matter, medium water needs.", soilType: ["loamy"], pH: ["medium"], nitrogen: ["medium"], phosphorus: ["medium"], potassium: ["medium"], ec: ["low"], organicCarbon: ["high"], water: "Medium (700-900 mm per season)" },
+        ginger: { name: "Ginger", description: "Loamy soil, high organic matter, medium water needs.", soilType: ["loamy"], pH: ["medium"], nitrogen: ["medium"], phosphorus: ["medium"], potassium: ["medium"], ec: ["low"], organicCarbon: ["high"], water: "Medium (700-900 mm per season)" },
+        garlic: { name: "Garlic", description: "Loamy soil, medium water needs.", soilType: ["loamy"], pH: ["medium"], nitrogen: ["medium"], phosphorus: ["medium"], potassium: ["medium"], ec: ["low"], organicCarbon: ["medium"], water: "Medium (500-700 mm per season)" },
+        chilli: { name: "Chilli", description: "Loamy soil, medium water needs.", soilType: ["loamy"], pH: ["medium"], nitrogen: ["medium"], phosphorus: ["medium"], potassium: ["medium"], ec: ["low"], organicCarbon: ["medium"], water: "Medium (500-700 mm per season)" },
+        coriander: { name: "Coriander", description: "Loamy soil, medium water needs.", soilType: ["loamy"], pH: ["medium"], nitrogen: ["medium"], phosphorus: ["medium"], potassium: ["medium"], ec: ["low"], organicCarbon: ["medium"], water: "Medium (500-700 mm per season)" },
+        cumin: { name: "Cumin", description: "Loamy soil, medium water needs.", soilType: ["loamy"], pH: ["medium"], nitrogen: ["medium"], phosphorus: ["medium"], potassium: ["medium"], ec: ["low"], organicCarbon: ["medium"], water: "Medium (500-700 mm per season)" },
+        fenugreek: { name: "Fenugreek", description: "Loamy soil, medium water needs.", soilType: ["loamy"], pH: ["medium"], nitrogen: ["medium"], phosphorus: ["medium"], potassium: ["medium"], ec: ["low"], organicCarbon: ["medium"], water: "Medium (500-700 mm per season)" },
+        safflower: { name: "Safflower", description: "Loamy soil, medium water needs.", soilType: ["loamy"], pH: ["medium"], nitrogen: ["medium"], phosphorus: ["medium"], potassium: ["medium"], ec: ["low"], organicCarbon: ["medium"], water: "Medium (500-700 mm per season)" },
+        linseed: { name: "Linseed", description: "Loamy soil, medium water needs.", soilType: ["loamy"], pH: ["medium"], nitrogen: ["medium"], phosphorus: ["medium"], potassium: ["medium"], ec: ["low"], organicCarbon: ["medium"], water: "Medium (500-700 mm per season)" },
+        saffron: { name: "Saffron", description: "Well-drained loamy soil, cool climate, medium water needs.", soilType: ["loamy"], pH: ["medium"], nitrogen: ["medium"], phosphorus: ["medium"], potassium: ["medium"], ec: ["low"], organicCarbon: ["medium"], water: "Medium (500-700 mm per season)" },
+        sugarbeet: { name: "Sugar beet", description: "Loamy soil, medium water needs.", soilType: ["loamy"], pH: ["medium"], nitrogen: ["medium"], phosphorus: ["medium"], potassium: ["medium"], ec: ["low"], organicCarbon: ["medium"], water: "Medium (500-700 mm per season)" },
+        sweetpotato: { name: "Sweet potato", description: "Sandy loam soil, medium water needs.", soilType: ["sandy loam"], pH: ["medium"], nitrogen: ["medium"], phosphorus: ["medium"], potassium: ["medium"], ec: ["low"], organicCarbon: ["medium"], water: "Medium (500-700 mm per season)" },
+        yam: { name: "Yam", description: "Loamy soil, medium water needs.", soilType: ["loamy"], pH: ["medium"], nitrogen: ["medium"], phosphorus: ["medium"], potassium: ["medium"], ec: ["low"], organicCarbon: ["medium"], water: "Medium (500-700 mm per season)" },
+        taro: { name: "Taro", description: "Loamy soil, medium water needs.", soilType: ["loamy"], pH: ["medium"], nitrogen: ["medium"], phosphorus: ["medium"], potassium: ["medium"], ec: ["low"], organicCarbon: ["medium"], water: "Medium (500-700 mm per season)" },
+        colocasia: { name: "Colocasia", description: "Loamy soil, medium water needs.", soilType: ["loamy"], pH: ["medium"], nitrogen: ["medium"], phosphorus: ["medium"], potassium: ["medium"], ec: ["low"], organicCarbon: ["medium"], water: "Medium (500-700 mm per season)" }
+    };
+
+    document.getElementById('soilReportForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const formData = {
+            soilType: document.getElementById('soilType').value,
+            soilpH: document.getElementById('soilpH').value,
+            nitrogen: document.getElementById('nitrogen').value,
+            phosphorus: document.getElementById('phosphorus').value,
+            potassium: document.getElementById('potassium').value,
+            ec: document.getElementById('ec').value,
+            organicCarbon: document.getElementById('organicCarbon').value
+        };
+        generateCropRecommendations(formData);
+        document.getElementById('soilReportForm').style.display = 'none';
+        document.getElementById('cropRecommendations').classList.add('active');
+    });
+    function generateCropRecommendations(soilData) {
+        const cropGrid = document.getElementById('cropGrid');
+        cropGrid.innerHTML = '';
+        const recommendedCrops = [];
+        Object.keys(cropDatabase).forEach(cropKey => {
+            const crop = cropDatabase[cropKey];
+            let score = 0;
+            if (crop.soilType.includes(soilData.soilType)) score++;
+            if (crop.pH.includes(soilData.soilpH)) score++;
+            if (crop.nitrogen.includes(soilData.nitrogen)) score++;
+            if (crop.phosphorus.includes(soilData.phosphorus)) score++;
+            if (crop.potassium.includes(soilData.potassium)) score++;
+            if (crop.ec.includes(soilData.ec)) score++;
+            if (crop.organicCarbon.includes(soilData.organicCarbon)) score++;
+            if (score >= 5) recommendedCrops.push({ ...crop, score, key: cropKey });
+        });
+        recommendedCrops.sort((a, b) => b.score - a.score);
+        recommendedCrops.forEach(crop => {
+            const cropCard = document.createElement('div');
+            cropCard.className = 'crop-card';
+            cropCard.innerHTML = `
+                <h4>${crop.name}</h4>
+                <p>${crop.description}</p>
+                <div class="crop-suitability">Water: ${crop.water}</div>
+            `;
+            // Make the card clickable to open the crop HTML page in a new tab
+            cropCard.addEventListener('click', function() {
+                const cropUrlMap = {
+                    'rice': 'rice',
+                    'wheat': 'wheat',
+                    'maize': 'maize',
+                    'sorghum': 'sorghum',
+                    'pearlmillet': 'pearl_millet',
+                    'fingermillet': 'finger_millet',
+                    'redgram': 'red_gram',
+                    'greengram': 'green_gram',
+                    'blackgram': 'black_gram',
+                    'lentil': 'lentil',
+                    'groundnut': 'groundnut',
+                    'sesame': 'sesame',
+                    'soybean': 'soybean',
+                    'mustard': 'mustard',
+                    'sunflower': 'sunflower',
+                    'cotton': 'cotton',
+                    'sugarcane': 'sugarcane',
+                    'jute': 'jute',
+                    'tea': 'tea',
+                    'coffee': 'coffee',
+                    'banana': 'banana',
+                    'tomato': 'tomato',
+                    'onion': 'onion',
+                    'apple': 'apple',
+                    'mango': 'mango',
+                    'grapes': 'grapes',
+                    'guava': 'guava',
+                    'papaya': 'papaya',
+                    'pineapple': 'pineapple',
+                    'pomegranate': 'pomegranate',
+                    'lemon': 'lemon',
+                    'orange': 'orange',
+                    'coconut': 'coconut',
+                    'arecanut': 'arecanut',
+                    'cashew': 'cashew',
+                    'cocoa': 'cocoa',
+                    'rubber': 'rubber_growing_guide_(1)'
+                };
+                const urlName = cropUrlMap[crop.key];
+                if (urlName) {
+                    window.open('/crop/' + urlName, '_blank');
+                } else {
+                    alert('Crop details not available for ' + crop.name);
+                }
+            });
+            cropGrid.appendChild(cropCard);
+        });
+    }
+    
+    function showCropDetails(cropKey, cropName) {
+        // Map crop keys to HTML file names
+        const cropFileMap = {
+            'rice': 'rice.html',
+            'wheat': 'wheat.html',
+            'maize': 'maize.html',
+            'sorghum': 'sorghum.html',
+            'pearlmillet': 'pearl_millet.html',
+            'fingermillet': 'finger_millet.html',
+            'redgram': 'red_gram.html',
+            'greengram': 'green_gram.html',
+            'blackgram': 'black_gram.html',
+            'lentil': 'lentil.html',
+            'groundnut': 'groundnut.html',
+            'sesame': 'sesame.html',
+            'soybean': 'soybean.html',
+            'mustard': 'mustard.html',
+            'sunflower': 'sunflower.html',
+            'cotton': 'cotton.html',
+            'sugarcane': 'sugarcane.html',
+            'jute': 'jute.html',
+            'tea': 'tea.html',
+            'coffee': 'coffee.html',
+            'banana': 'banana.html',
+            'tomato': 'tomato.html',
+            'onion': 'onion.html',
+            'apple': 'apple.html',
+            'mango': 'mango.html',
+            'grapes': 'grapes.html',
+            'guava': 'guava.html',
+            'papaya': 'papaya.html',
+            'pineapple': 'pineapple.html',
+            'pomegranate': 'pomegranate.html',
+            'lemon': 'lemon.html',
+            'orange': 'orange.html',
+            'coconut': 'coconut.html',
+            'arecanut': 'arecanut.html',
+            'cashew': 'cashew.html',
+            'cocoa': 'cocoa.html',
+            'rubber': 'rubber_growing_guide_(1).html'
+        };
+        
+        const fileName = cropFileMap[cropKey];
+        if (!fileName) {
+            alert('Crop details not available for ' + cropName);
+            return;
+        }
+        
+        // Show loading
+        document.getElementById('cropDetailsContent').innerHTML = '<p>Loading crop details...</p>';
+        document.getElementById('cropRecommendations').style.display = 'none';
+        document.getElementById('cropDetails').style.display = 'block';
+        
+        // Fetch the crop HTML file
+        fetch('templates/' + fileName)
+            .then(response => response.text())
+            .then(data => {
+                // Extract the main content from the crop HTML file
+                let bodyMatch = data.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
+                let content = bodyMatch ? bodyMatch[1] : data;
+                
+                // Clean up the content (remove scripts, etc.)
+                content = content.replace(/<script[\s\S]*?<\/script>/gi, '');
+                
+                document.getElementById('cropDetailsContent').innerHTML = content;
+            })
+            .catch(error => {
+                document.getElementById('cropDetailsContent').innerHTML = 
+                    '<p style="color: #c00;">Error loading crop details. Please try again.</p>';
+                console.error('Error:', error);
+            });
+    }
+    
+    function backToRecommendations() {
+        document.getElementById('cropDetails').style.display = 'none';
+        document.getElementById('cropRecommendations').style.display = 'block';
+    }
+    
+    function proceedWithSelection() {
+        const selectedCrops = document.querySelectorAll('.crop-card.selected');
+        if (selectedCrops.length === 0) { alert('Please select at least one crop to continue.'); return; }
+        const selectedCropKeys = Array.from(selectedCrops).map(card => {
+            // Find the crop key by matching the name
+            const name = card.querySelector('h4').textContent;
+            for (const key in cropDatabase) {
+                if (cropDatabase[key].name === name) return key;
+            }
+            return null;
+        }).filter(Boolean);
+        // Hide recommendations, show details
+        document.getElementById('cropRecommendations').style.display = 'none';
+        document.getElementById('cropDetails').style.display = 'block';
+        document.getElementById('cropDetailsContent').innerHTML = '<p>Loading selected crop details...</p>';
+        // Map crop keys to HTML file names
+        const cropFileMap = {
+            'rice': 'rice.html',
+            'wheat': 'wheat.html',
+            'maize': 'maize.html',
+            'sorghum': 'sorghum.html',
+            'pearlmillet': 'pearl_millet.html',
+            'fingermillet': 'finger_millet.html',
+            'redgram': 'red_gram.html',
+            'greengram': 'green_gram.html',
+            'blackgram': 'black_gram.html',
+            'lentil': 'lentil.html',
+            'groundnut': 'groundnut.html',
+            'sesame': 'sesame.html',
+            'soybean': 'soybean.html',
+            'mustard': 'mustard.html',
+            'sunflower': 'sunflower.html',
+            'cotton': 'cotton.html',
+            'sugarcane': 'sugarcane.html',
+            'jute': 'jute.html',
+            'tea': 'tea.html',
+            'coffee': 'coffee.html',
+            'banana': 'banana.html',
+            'tomato': 'tomato.html',
+            'onion': 'onion.html',
+            'apple': 'apple.html',
+            'mango': 'mango.html',
+            'grapes': 'grapes.html',
+            'guava': 'guava.html',
+            'papaya': 'papaya.html',
+            'pineapple': 'pineapple.html',
+            'pomegranate': 'pomegranate.html',
+            'lemon': 'lemon.html',
+            'orange': 'orange.html',
+            'coconut': 'coconut.html',
+            'arecanut': 'arecanut.html',
+            'cashew': 'cashew.html',
+            'cocoa': 'cocoa.html',
+            'rubber': 'rubber_growing_guide_(1).html'
+        };
+        // Fetch all selected crop details
+        Promise.all(selectedCropKeys.map(key => {
+            const fileName = cropFileMap[key];
+            if (!fileName) return Promise.resolve(`<div class='crop-card' style='margin-bottom:32px;'><h3>${cropDatabase[key].name}</h3><p>Details not available.</p></div>`);
+            return fetch('templates/' + fileName)
+                .then(resp => resp.text())
+                .then(data => {
+                    let bodyMatch = data.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
+                    let content = bodyMatch ? bodyMatch[1] : data;
+                    content = content.replace(/<script[\s\S]*?<\/script>/gi, '');
+                    return `<section class='crop-card' style='margin-bottom:32px;'>${content}</section>`;
+                })
+                .catch(() => `<div class='crop-card' style='margin-bottom:32px;'><h3>${cropDatabase[key].name}</h3><p>Error loading details.</p></div>`);
+        })).then(cropCards => {
+            document.getElementById('cropDetailsContent').innerHTML = cropCards.join('');
+        });
+    }
+    function backToForm() {
+        document.getElementById('cropRecommendations').classList.remove('active');
+        document.getElementById('soilReportForm').style.display = 'block';
+    }
+    function resetForm() {
+        document.getElementById('soilReportForm').reset();
+    }
+</script>
+</body>
+</html>

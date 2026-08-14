@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agent Dashboard — AgriMarket</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --soil: #3d2b1f;
+            --leaf: #2d6a4f;
+            --harvest: #e9c46a;
+            --stem: #52b788;
+            --sky: #2563eb;
+            --white: #fafaf8;
+            --mist: #f0f4f0;
+            --pending: #f59e0b;
+            --accepted: #10b981;
+            --rejected: #ef4444;
+            --processing: #3b82f6;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'DM Sans', sans-serif; background: var(--mist); color: var(--soil); }
+
+        /* SIDEBAR */
+        .sidebar {
+            position: fixed; top: 0; left: 0; bottom: 0;
+            width: 250px; background: var(--soil);
+            display: flex; flex-direction: column;
+            padding: 28px 0; z-index: 50;
+        }
+        .sidebar-logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.4rem; font-weight: 900;
+            color: var(--white); padding: 0 28px 32px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .sidebar-logo span { color: var(--harvest); }
+        .sidebar-nav { flex: 1; padding: 24px 0; }
+        .nav-item {
+            display: flex; align-items: center; gap: 12px;
+            padding: 13px 28px; color: rgba(255,255,255,0.65);
+            text-decoration: none; font-size: 0.95rem; font-weight: 500;
+            transition: all 0.2s; cursor: pointer; border: none; background: none;
+            width: 100%;
+        }
+        .nav-item:hover, .nav-item.active {
+            background: rgba(255,255,255,0.08);
+            color: var(--white); padding-left: 32px;
+        }
+        .nav-item.active { border-left: 3px solid var(--harvest); padding-left: 25px; }
+        .nav-icon { font-size: 1.1rem; width: 22px; text-align: center; }
+        .sidebar-footer { padding: 20px 28px; border-top: 1px solid rgba(255,255,255,0.1); }
+        .logout-btn {
+            display: flex; align-items: center; gap: 10px;
+            color: rgba(255,255,255,0.5); font-size: 0.9rem;
+            text-decoration: none; transition: color 0.2s;
+        }
+        .logout-btn:hover { color: var(--harvest); }
+
+        /* MAIN */
+        .main { margin-left: 250px; padding: 32px; min-height: 100vh; }
+        .topbar {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 32px;
+        }
+        .page-title { font-family: 'Playfair Display', serif; font-size: 1.9rem; color: var(--soil); }
+        .topbar-right { display: flex; align-items: center; gap: 16px; }
+        .notif-btn {
+            position: relative; background: var(--white); border: none;
+            width: 44px; height: 44px; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.2rem; cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .notif-badge {
+            position: absolute; top: -6px; right: -6px;
+            background: var(--rejected); color: white;
+            border-radius: 50%; width: 20px; height: 20px;
+            font-size: 0.72rem; font-weight: 700;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .agent-pill {
+            background: var(--white); padding: 8px 18px 8px 8px;
+            border-radius: 50px; display: flex; align-items: center; gap: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.07); font-size: 0.92rem;
+        }
+        .agent-avatar {
+            width: 32px; height: 32px; border-radius: 50%;
+            background: linear-gradient(135deg, var(--leaf), var(--stem));
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-weight: 700; font-size: 0.9rem;
+        }
+
+        /* STATS */
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 32px; }
+        .stat-card {
+            background: var(--white); border-radius: 18px; padding: 24px 28px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            border-left: 4px solid transparent;
+            display: flex; align-items: center; gap: 20px;
+        }
+        .stat-card.crops { border-color: var(--pending); }
+        .stat-card.soil { border-color: var(--processing); }
+        .stat-card.notifs { border-color: var(--rejected); }
+        .stat-icon {
+            width: 52px; height: 52px; border-radius: 14px;
+            display: flex; align-items: center; justify-content: center; font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+        .stat-card.crops .stat-icon { background: rgba(245,158,11,0.12); }
+        .stat-card.soil .stat-icon { background: rgba(59,130,246,0.12); }
+        .stat-card.notifs .stat-icon { background: rgba(239,68,68,0.1); }
+        .stat-num { font-family: 'Playfair Display', serif; font-size: 2.2rem; font-weight: 900; color: var(--soil); }
+        .stat-lbl { font-size: 0.88rem; color: #888; margin-top: 2px; }
+
+        /* SECTION */
+        .section-block { margin-bottom: 36px; }
+        .section-header {
+            display: flex; align-items: center; gap: 12px;
+            margin-bottom: 20px;
+        }
+        .section-header h2 { font-family: 'Playfair Display', serif; font-size: 1.3rem; color: var(--soil); }
+        .section-header .count-badge {
+            background: var(--leaf); color: var(--white);
+            border-radius: 50px; padding: 3px 12px; font-size: 0.82rem; font-weight: 700;
+        }
+
+        /* CARDS SCROLL */
+        .cards-scroll { display: flex; gap: 20px; overflow-x: auto; padding-bottom: 8px; }
+        .cards-scroll::-webkit-scrollbar { height: 4px; }
+        .cards-scroll::-webkit-scrollbar-track { background: transparent; }
+        .cards-scroll::-webkit-scrollbar-thumb { background: #d4e8d4; border-radius: 2px; }
+
+        /* CROP CARD */
+        .crop-card {
+            background: var(--white); border-radius: 18px; padding: 22px;
+            min-width: 290px; max-width: 290px;
+            box-shadow: 0 3px 14px rgba(0,0,0,0.07);
+            border-top: 3px solid transparent; position: relative; flex-shrink: 0;
+        }
+        .crop-card.pending { border-color: var(--pending); }
+        .crop-card.accepted { border-color: var(--accepted); }
+        .crop-card.rejected { border-color: var(--rejected); }
+        .crop-card.processing { border-color: var(--processing); }
+        .status-pill {
+            position: absolute; top: 16px; right: 16px;
+            padding: 4px 12px; border-radius: 50px;
+            font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .pill-pending { background: #fef3c7; color: #92400e; }
+        .pill-accepted { background: #d1fae5; color: #065f46; }
+        .pill-rejected { background: #fee2e2; color: #991b1b; }
+        .pill-processing { background: #dbeafe; color: #1e40af; }
+        .pill-completed { background: #d1fae5; color: #065f46; }
+        .crop-name {
+            font-family: 'Playfair Display', serif; font-size: 1.15rem;
+            color: var(--soil); margin-bottom: 14px; margin-right: 80px;
+        }
+        .crop-meta { display: flex; flex-direction: column; gap: 5px; margin-bottom: 18px; }
+        .crop-meta-row { display: flex; align-items: center; gap: 8px; font-size: 0.88rem; color: #666; }
+        .crop-meta-row strong { color: var(--soil); }
+        .card-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+        .btn-sm {
+            padding: 7px 16px; border-radius: 8px; font-size: 0.84rem;
+            font-weight: 600; font-family: 'DM Sans', sans-serif;
+            cursor: pointer; border: none; text-decoration: none;
+            display: inline-flex; align-items: center; gap: 5px;
+            transition: all 0.2s;
+        }
+        .btn-accept { background: var(--accepted); color: white; }
+        .btn-accept:hover { background: #059669; }
+        .btn-reject { background: var(--rejected); color: white; }
+        .btn-reject:hover { background: #dc2626; }
+        .btn-fill { background: var(--stem); color: white; }
+        .btn-fill:hover { background: var(--leaf); }
+        .btn-contact { background: var(--processing); color: white; }
+        .btn-contact:hover { background: #2563eb; }
+        .btn-view { background: var(--harvest); color: var(--soil); }
+        .btn-view:hover { background: #d4a839; }
+        .btn-del { background: #fee2e2; color: var(--rejected); }
+        .btn-del:hover { background: var(--rejected); color: white; }
+
+        /* EMPTY STATE */
+        .empty-state {
+            text-align: center; padding: 48px 24px;
+            color: #a0b0a0;
+        }
+        .empty-state .e-icon { font-size: 3rem; margin-bottom: 12px; }
+        .empty-state p { font-size: 0.95rem; }
+
+        /* NOTIF DROPDOWN */
+        .notif-dropdown {
+            position: absolute; top: 52px; right: 0;
+            background: white; border-radius: 16px;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+            width: 340px; z-index: 200; display: none;
+            overflow: hidden;
+        }
+        .notif-dropdown.show { display: block; }
+        .nd-header { padding: 16px 20px; border-bottom: 1px solid #f0f0f0; font-weight: 700; }
+        .nd-item { padding: 14px 20px; border-bottom: 1px solid #f9f9f9; font-size: 0.9rem; }
+        .nd-item:last-child { border-bottom: none; }
+
+        /* TABS */
+        .tabs { display: flex; gap: 4px; margin-bottom: 20px; background: var(--mist); padding: 4px; border-radius: 12px; width: fit-content; }
+        .tab-btn {
+            padding: 9px 22px; border-radius: 10px; border: none;
+            background: transparent; font-family: 'DM Sans', sans-serif;
+            font-size: 0.9rem; font-weight: 600; cursor: pointer;
+            color: #888; transition: all 0.2s;
+        }
+        .tab-btn.active { background: var(--white); color: var(--soil); box-shadow: 0 2px 6px rgba(0,0,0,0.08); }
+
+        audio { display: none; }
+
+        @media (max-width: 900px) {
+            .sidebar { display: none; }
+            .main { margin-left: 0; padding: 20px; }
+            .stats-grid { grid-template-columns: 1fr 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+    <div class="sidebar-logo">Agri<span>Market</span></div>
+    <nav class="sidebar-nav">
+        <a href="/agenthome" class="nav-item active"><span class="nav-icon">🏠</span> Dashboard</a>
+        <a href="/profile" class="nav-item"><span class="nav-icon">👤</span> My Profile</a>
+        <a href="/soilagent" class="nav-item"><span class="nav-icon">🌱</span> Soil Dashboard</a>
+        <a href="/agent" class="nav-item"><span class="nav-icon">📋</span> Agents Directory</a>
+    </nav>
+    <div class="sidebar-footer">
+        <a href="/logout" class="logout-btn">🚪 Logout</a>
+    </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+    <div class="topbar">
+        <div>
+            <div class="page-title">Agent Dashboard</div>
+            <div style="color:#888;font-size:0.9rem;margin-top:4px;">Manage crop submissions & soil requests</div>
+        </div>
+        <div class="topbar-right">
+            <div style="position:relative;">
+                <button class="notif-btn" id="notifBtn" onclick="toggleNotif()">
+                    🔔
+                    {% if notifications and notifications|length > 0 %}
+                    <span class="notif-badge">{{ notifications|length }}</span>
+                    {% endif %}
+                </button>
+                {% if notifications and notifications|length > 0 %}
+                <div class="notif-dropdown" id="notifDropdown">
+                    <div class="nd-header">🔔 {{ notifications|length }} New Submission{{ 's' if notifications|length > 1 }}</div>
+                    {% for note in notifications[:4] %}
+                    <div class="nd-item">
+                        <strong>{{ note.cropname }}</strong> from {{ note.seller_name }}<br>
+                        <small style="color:#888;">{{ note.place }} · ₹{{ note.price }}</small>
+                    </div>
+                    {% endfor %}
+                    {% if notifications|length > 4 %}
+                    <div class="nd-item" style="color:var(--leaf);font-weight:600;">+ {{ notifications|length - 4 }} more...</div>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+            <div class="agent-pill">
+                <div class="agent-avatar">A</div>
+                <span>Agent</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats-grid">
+        <div class="stat-card crops">
+            <div class="stat-icon">🌾</div>
+            <div>
+                <div class="stat-num">{{ notifications|length if notifications else 0 }}</div>
+                <div class="stat-lbl">Crop Submissions</div>
+            </div>
+        </div>
+        <div class="stat-card soil">
+            <div class="stat-icon">🧪</div>
+            <div>
+                <div class="stat-num">{{ soil_requests|length if soil_requests else 0 }}</div>
+                <div class="stat-lbl">Soil Requests</div>
+            </div>
+        </div>
+        <div class="stat-card notifs">
+            <div class="stat-icon">🔔</div>
+            <div>
+                <div class="stat-num">{{ unread_count if unread_count else 0 }}</div>
+                <div class="stat-lbl">New Notifications</div>
+            </div>
+        </div>
+    </div>
+
+    {% if notifications %}
+    <!-- ─── CROP SUBMISSIONS ─── -->
+    <div class="section-block">
+        <div class="section-header">
+            <h2>🌾 Crop Submissions</h2>
+        </div>
+
+        <!-- TABS -->
+        <div class="tabs">
+            <button class="tab-btn active" onclick="showTab('pending')">⏳ Pending</button>
+            <button class="tab-btn" onclick="showTab('accepted')">✅ Accepted</button>
+            <button class="tab-btn" onclick="showTab('rejected')">❌ Rejected</button>
+        </div>
+
+        <!-- PENDING -->
+        <div id="tab-pending">
+            <div class="cards-scroll">
+                {% set has_pending = [] %}
+                {% for note in notifications %}
+                {% set status = note.response if note.response else 'pending' %}
+                {% if note.cropname and status|lower == 'pending' %}
+                {% if has_pending.append(1) %}{% endif %}
+                <div class="crop-card pending">
+                    <span class="status-pill pill-pending">Pending</span>
+                    <div class="crop-name">{{ note.cropname }}</div>
+                    <div class="crop-meta">
+                        <div class="crop-meta-row">📅 <strong>{{ note.created_at.strftime('%d %b, %Y') if note.created_at else '—' }}</strong></div>
+                        <div class="crop-meta-row">⚖️ <strong>{{ note.quantity }} kg</strong></div>
+                        <div class="crop-meta-row">💰 <strong>₹{{ note.price }}</strong></div>
+                        <div class="crop-meta-row">👤 {{ note.seller_name }}</div>
+                        <div class="crop-meta-row">📍 {{ note.place }}</div>
+                        <div class="crop-meta-row">📞 {{ note.phone }}</div>
+                    </div>
+                    <div class="card-actions">
+                        <form action="/accept_crop/{{ note._id }}" method="post" style="display:inline">
+                            <button type="submit" class="btn-sm btn-accept">✅ Accept</button>
+                        </form>
+                        <form action="/reject_crop/{{ note._id }}" method="post" style="display:inline">
+                            <button type="submit" class="btn-sm btn-reject">❌ Reject</button>
+                        </form>
+                    </div>
+                </div>
+                {% endif %}
+                {% endfor %}
+                {% if not has_pending %}
+                <div class="empty-state"><div class="e-icon">✅</div><p>No pending submissions</p></div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- ACCEPTED -->
+        <div id="tab-accepted" style="display:none;">
+            <div class="cards-scroll">
+                {% set has_accepted = [] %}
+                {% for note in notifications %}
+                {% set status = note.response if note.response else 'pending' %}
+                {% if note.cropname and status|lower == 'accepted' %}
+                {% if has_accepted.append(1) %}{% endif %}
+                <div class="crop-card accepted">
+                    <span class="status-pill pill-accepted">Accepted</span>
+                    <div class="crop-name">{{ note.cropname }}</div>
+                    <div class="crop-meta">
+                        <div class="crop-meta-row">⚖️ <strong>{{ note.quantity }} kg</strong></div>
+                        <div class="crop-meta-row">💰 <strong>₹{{ note.price }}</strong></div>
+                        <div class="crop-meta-row">👤 {{ note.seller_name }}</div>
+                        <div class="crop-meta-row">📍 {{ note.place }}</div>
+                    </div>
+                </div>
+                {% endif %}
+                {% endfor %}
+                {% if not has_accepted %}
+                <div class="empty-state"><div class="e-icon">📋</div><p>No accepted submissions yet</p></div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- REJECTED -->
+        <div id="tab-rejected" style="display:none;">
+            <div class="cards-scroll">
+                {% set has_rejected = [] %}
+                {% for note in notifications %}
+                {% set status = note.response if note.response else 'pending' %}
+                {% if note.cropname and status|lower == 'rejected' %}
+                {% if has_rejected.append(1) %}{% endif %}
+                <div class="crop-card rejected">
+                    <span class="status-pill pill-rejected">Rejected</span>
+                    <div class="crop-name">{{ note.cropname }}</div>
+                    <div class="crop-meta">
+                        <div class="crop-meta-row">⚖️ <strong>{{ note.quantity }} kg</strong></div>
+                        <div class="crop-meta-row">👤 {{ note.seller_name }}</div>
+                        <div class="crop-meta-row">📍 {{ note.place }}</div>
+                    </div>
+                </div>
+                {% endif %}
+                {% endfor %}
+                {% if not has_rejected %}
+                <div class="empty-state"><div class="e-icon">📋</div><p>No rejected submissions</p></div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if soil_requests %}
+    <!-- ─── SOIL REQUESTS ─── -->
+    <div class="section-block">
+        <div class="section-header">
+            <h2>🧪 Soil Analysis Requests</h2>
+        </div>
+
+        <div class="tabs">
+            <button class="tab-btn active" onclick="showSoilTab('new')">🆕 New</button>
+            <button class="tab-btn" onclick="showSoilTab('processing')">🔄 Processing</button>
+            <button class="tab-btn" onclick="showSoilTab('completed')">✅ Completed</button>
+        </div>
+
+        <!-- NEW SOIL -->
+        <div id="soil-new">
+            <div class="cards-scroll">
+                {% set has_new = [] %}
+                {% for req in soil_requests %}
+                {% if not req.agent_response or req.agent_response == 'pending' %}
+                {% if has_new.append(1) %}{% endif %}
+                <div class="crop-card processing">
+                    <span class="status-pill pill-processing">New Request</span>
+                    <div class="crop-name">🌱 {{ req.farmer_name }}</div>
+                    <div class="crop-meta">
+                        <div class="crop-meta-row">📱 {{ req.farmer_phone }}</div>
+                        <div class="crop-meta-row">📍 {{ req.farmer_address }}</div>
+                        <div class="crop-meta-row">🌾 {{ req.crop_intention if req.crop_intention else 'Not specified' }}</div>
+                        <div class="crop-meta-row">📅 {{ req.created_at.strftime('%d %b, %H:%M') if req.created_at else '' }}</div>
+                    </div>
+                    <div class="card-actions">
+                        <form action="/respond-to-soil-request/{{ req._id }}" method="post" style="display:inline">
+                            <input type="hidden" name="response_type" value="accepted">
+                            <button type="submit" class="btn-sm btn-accept">✅ Accept</button>
+                        </form>
+                        <form action="/respond-to-soil-request/{{ req._id }}" method="post" style="display:inline">
+                            <input type="hidden" name="response_type" value="rejected">
+                            <button type="submit" class="btn-sm btn-reject">❌ Reject</button>
+                        </form>
+                    </div>
+                </div>
+                {% endif %}
+                {% endfor %}
+                {% if not has_new %}
+                <div class="empty-state"><div class="e-icon">✅</div><p>No new soil requests</p></div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- PROCESSING SOIL -->
+        <div id="soil-processing" style="display:none;">
+            <div class="cards-scroll">
+                {% for req in soil_requests %}
+                {% if req.agent_response == 'accepted' or req.agent_response == 'contacted' %}
+                <div class="crop-card processing">
+                    <span class="status-pill pill-processing">Processing</span>
+                    <div class="crop-name">🌱 {{ req.farmer_name }}</div>
+                    <div class="crop-meta">
+                        <div class="crop-meta-row">📱 {{ req.farmer_phone }}</div>
+                        <div class="crop-meta-row">📍 {{ req.farmer_address }}</div>
+                        <div class="crop-meta-row">🌾 {{ req.crop_intention if req.crop_intention else 'N/A' }}</div>
+                    </div>
+                    <div class="card-actions">
+                        <a href="/fill-soil-report?request_id={{ req._id }}&farmer={{ req.farmer_name }}" class="btn-sm btn-fill">📋 Fill Form</a>
+                        <a href="/update-soil-report/{{ req._id }}" class="btn-sm btn-view">✏️ Update</a>
+                        <form action="/delete-soil-request/{{ req._id }}" method="post" style="display:inline" onsubmit="return confirm('Delete this request?')">
+                            <button type="submit" class="btn-sm btn-del">🗑️</button>
+                        </form>
+                    </div>
+                </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- COMPLETED SOIL -->
+        <div id="soil-completed" style="display:none;">
+            <div class="cards-scroll">
+                {% for req in soil_requests %}
+                {% if req.is_read and req.agent_response == 'scheduled' %}
+                <div class="crop-card accepted">
+                    <span class="status-pill pill-completed">Completed</span>
+                    <div class="crop-name">✅ {{ req.farmer_name }}</div>
+                    <div class="crop-meta">
+                        <div class="crop-meta-row">📱 {{ req.farmer_phone }}</div>
+                        <div class="crop-meta-row">🌾 {{ req.crop_intention if req.crop_intention else 'N/A' }}</div>
+                        <div class="crop-meta-row">✅ {{ req.responded_at.strftime('%d %b, %Y') if req.responded_at else '' }}</div>
+                    </div>
+                    <div class="card-actions">
+                        <a href="/view-soil-report/{{ req._id }}" class="btn-sm btn-view">👁️ View</a>
+                        <form action="/delete-soil-request/{{ req._id }}" method="post" style="display:inline" onsubmit="return confirm('Delete?')">
+                            <button type="submit" class="btn-sm btn-del">🗑️</button>
+                        </form>
+                    </div>
+                </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+</main>
+
+<audio id="notifSound" src="https://cdn.pixabay.com/audio/2022/07/26/audio_124bfae5b6.mp3" preload="auto"></audio>
+
+<script>
+function showTab(tab) {
+    ['pending','accepted','rejected'].forEach(t => {
+        document.getElementById('tab-'+t).style.display = t === tab ? 'block' : 'none';
+    });
+    document.querySelectorAll('.tabs')[0].querySelectorAll('.tab-btn').forEach((btn, i) => {
+        btn.classList.toggle('active', ['pending','accepted','rejected'][i] === tab);
+    });
+}
+function showSoilTab(tab) {
+    ['new','processing','completed'].forEach(t => {
+        document.getElementById('soil-'+t).style.display = t === tab ? 'block' : 'none';
+    });
+    document.querySelectorAll('.tabs')[1].querySelectorAll('.tab-btn').forEach((btn, i) => {
+        btn.classList.toggle('active', ['new','processing','completed'][i] === tab);
+    });
+}
+function toggleNotif() {
+    const dd = document.getElementById('notifDropdown');
+    if (!dd) return;
+    dd.classList.toggle('show');
+    if (dd.classList.contains('show')) {
+        document.getElementById('notifSound')?.play().catch(()=>{});
+    }
+}
+document.addEventListener('click', e => {
+    const dd = document.getElementById('notifDropdown');
+    const btn = document.getElementById('notifBtn');
+    if (dd && btn && !btn.contains(e.target) && !dd.contains(e.target)) dd.classList.remove('show');
+});
+
+// Auto-refresh every 30s
+setInterval(() => {
+    fetch('/check-new-notifications').then(r=>r.json()).then(d=>{
+        if(d.new_notifications > 0) location.reload();
+    }).catch(()=>{});
+}, 30000);
+</script>
+</body>
+</html>
